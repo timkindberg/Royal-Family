@@ -1,35 +1,55 @@
 # Royal Family
 
-Two royal families race to destroy each other. An open source table top game that requires only a normal deck of cards
+Two royal families race to destroy each other. An open source table top game that requires only a normal deck of cards.
 
 #### Two Players
+
+### Card Designations
+
+- Ace: Castle
+- King, Queen, Jack: Royal Family Members
+- 3–10: Troops
+- 2: Assassin
 
 ### Setup: 
 
 1. Get a normal 52 count card deck. Keep the Jokers in the deck.
-1. Each player starts with a castle (Ace card):
-  - Player One starts with a black castle placed in front of them (Ace of Spades). This is the Darklein family, their crest is the Spade &#9824;. The crest of their alliance family is the Club &#9827;.
-  - Player Two starts with a red castle placed in front of them (Ace of Hearts). This is the Bludgein family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
-1. Shuffle the remaining deck.
-1. Deal three (3) cards from the top of the deck. Place them between the two the castles and the deck to the side of the three cards as follows:
+1. Each player starts with two castles of the same color (Ace cards):
+  - Player One (Black):
+    - The Starless family, their crest is the Spade &#9824;. The crest of their alliance family is the Club &#9827;.
+    - Player One starts with both black castles placed in front of them—**Spade face up and Club face down**. The Spade castle starts already developed and the Club castle is not yet developed.
+  - Player Two (Red):
+    - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
+    - Player Two starts with both red castles placed in front of them—**Heart face up and Diamon face down**. The Heart castle starts already developed and the Diamond castle is not yet developed.
+1. Shuffle the remaining deck and place the deck to the side. 
+1. Deal the first round's flop. Place them between the two players. This is "The Field".
+1. Final Setup should look as like this:
 
 ```
-           Ace 1
-     
-DECK | ?1 | ?2 | ?3
+               Ace 2   Ace 1
+               Down     Up
+           
+The              The Field     
+DECK     Card 1 | Card 2 | Card 3
+Down       Up       Up       Up
 
-           Ace 2
+               Ace 1   Ace 2
+                Up     Down
 ```
 
 ### Objective
 
-A player wins when they complete one of the objectives:
-- Destroy all opponent castles
-- Populate two castles (A) with their full royal family (K, Q, J). Two castles means your castle and your alliances castle.
+A player wins when their opponent has no active castles. Castles are active if they are both fully developed and also not destroyed.
 
 ### Game Play
 
-Players take turns. The player with least matching suit cards in the initial three that were dealt goes first. If a tie, then match against color instead.
+The game is played in an unending series of rounds until the Objective is met by a winning player.
+
+##### Round Breakdown
+
+A round consists of:
+
+1. The Flop: Deal three cards from the deck
 
 ##### On a player's turn they do the following, in order:
 
