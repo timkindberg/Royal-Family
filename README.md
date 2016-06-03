@@ -22,8 +22,8 @@ Two royal families race to destroy each other. An open source table top game tha
   - Player Two (Red):
     - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
     - Player Two starts with both red castles placed in front of them—**Heart face up and Diamond face down**. The Heart castle starts fully developed and the Diamond castle is not yet developed.
-1. Shuffle the remaining deck and place the deck to the side. 
-1. Deal the first round's flop face up between the two players. This is "The Field".
+1. Shuffle the remaining deck and place the deck to the side, face down. 
+1. Deal the first round's flop—face up—between the two players. This is "The Field".
 1. Final Setup should look as like this:
 
 ```
