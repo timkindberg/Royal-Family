@@ -10,6 +10,7 @@ Two royal families race to destroy each other. An open source table top game tha
 - King, Queen, Jack: Royal Family Members
 - 3–10: Troops
 - 2: Assassin
+- Joker: Toggles the Age
 
 ### Setup: 
 
@@ -22,7 +23,7 @@ Two royal families race to destroy each other. An open source table top game tha
     - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
     - Player Two starts with both red castles placed in front of them—**Heart face up and Diamon face down**. The Heart castle starts already developed and the Diamond castle is not yet developed.
 1. Shuffle the remaining deck and place the deck to the side. 
-1. Deal the first round's flop. Place them between the two players. This is "The Field".
+1. Deal the first round's flop face up between the two players. This is "The Field".
 1. Final Setup should look as like this:
 
 ```
@@ -30,26 +31,37 @@ Two royal families race to destroy each other. An open source table top game tha
                Down     Up
            
 The              The Field     
-DECK     Card 1 | Card 2 | Card 3
-Down       Up       Up       Up
+Deck     Card 1 | Card 2 | Card 3
+Down       Up   |   Up   |   Up
 
                Ace 1   Ace 2
                 Up     Down
 ```
 
-### Objective
+### Winning
 
-A player wins when their opponent has no active castles. Castles are active if they are both fully developed and also not destroyed.
+A player wins when their opponent has no active castles. Active Castle means it not not being developed and not destroyed.
 
 ### Game Play
 
-The game is played in an unending series of rounds until the Objective is met by a winning player.
+The game is played in an continuous series of rounds until the winning objective is met by a winning player.
 
 ##### Round Breakdown
 
 A round consists of:
 
-1. The Flop: Deal three cards from the deck
+1. The Flop: 
+  1. Deal: Deal three cards from the deck to the field.
+  1. Resolve Age Change: If any of the three cards is a Joker, move it off to the side opposite the deck and replace it with a new card from the deck. If a joker is already present there, then place both jokers in the discard pile. 
+1. Determine the Current Age: 
+  - "Age of Uprising" if the Joker is __not__ present.
+  - "Age of Oppression" if the Joker __is__ present.
+1. Determine Turn Order: A round consists of three (3) turns. One of the players gets the 1st and 3rd turn. The other player gets the 2nd turn. Turn order is dependent on the current age.
+  1. First look at the three cards in the field. Count how many red cards and how many black cards.
+  2. If it's the Age of Uprising, then the player with the __lower__ count goes 1st and 3rd, the other player goes 2nd.
+  3. If it's the Age of Oppression, then the player with the __higher__ count goes 1st and 3rd, the other player goes 2nd.
+1. The Three Turns
+1. End of Round
 
 ##### On a player's turn they do the following, in order:
 
