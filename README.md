@@ -18,10 +18,10 @@ Two royal families race to destroy each other. An open source table top game tha
 1. Each player starts with two castles of the same color (Ace cards):
   - Player One (Black):
     - The Starless family, their crest is the Spade &#9824;. The crest of their alliance family is the Club &#9827;.
-    - Player One starts with both black castles placed in front of them—**Spade face up and Club face down**. The Spade castle starts already developed and the Club castle is not yet developed.
+    - Player One starts with both black castles placed in front of them—**Spade face up and Club face down**. The Spade castle starts fully developed and the Club castle is not yet developed.
   - Player Two (Red):
     - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
-    - Player Two starts with both red castles placed in front of them—**Heart face up and Diamon face down**. The Heart castle starts already developed and the Diamond castle is not yet developed.
+    - Player Two starts with both red castles placed in front of them—**Heart face up and Diamond face down**. The Heart castle starts fully developed and the Diamond castle is not yet developed.
 1. Shuffle the remaining deck and place the deck to the side. 
 1. Deal the first round's flop face up between the two players. This is "The Field".
 1. Final Setup should look as like this:
