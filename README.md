@@ -24,18 +24,18 @@ Two royal families race to destroy each other. An open source table top game tha
     - Player Two starts with both red castles placed in front of them—**Heart face up and Diamond face down**. The Heart castle starts fully developed and the Diamond castle is not yet developed.
 1. Shuffle the remaining deck and place the deck to the side, face down. 
 1. Deal the first round's flop—face up—between the two players. This is "The Field".
-1. Final setup should look as like this:
+1. Final setup should look as like this (^ is face up, v is face down):
 
 ```
                      Ace 2   Ace 1
-                     Down     Up
+                       v       ^
            
 Dis-   The              The Field     
 Card   Deck     Card 1 | Card 2 | Card 3
-Up     Down       Up   |   Up   |   Up
+ ^      v         ^    |   ^    |   ^
 
                      Ace 1   Ace 2
-                      Up     Down
+                       ^       v
 ```
 
 ### Winning
