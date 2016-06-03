@@ -17,7 +17,7 @@ Two royal families race to destroy each other. An open source table top game tha
 1. Get a normal 52 count card deck. Keep the Jokers in the deck.
 1. Each player starts with two castles of the same color (Ace cards):
   - Player One (Black):
-    - The Starless family, their crest is the Spade &#9824;. The crest of their alliance family is the Club &#9827;.
+    - The Starless family, their crest is the Spade ♠️️. The crest of their alliance family is t
     - Player One starts with both black castles placed in front of them—**Spade face up and Club face down**. The Spade castle starts fully developed and the Club castle is not yet developed.
   - Player Two (Red):
     - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
@@ -40,19 +40,32 @@ Down       Up   |   Up   |   Up
 
 ### Winning
 
+⚑⚑⚑⚑
+
 A player wins when their opponent has no active castles. Active Castle means it not being developed and not destroyed.
 
 ### Game Play
 
-The game is played in a continuous series of [Rounds](#round-breakdown) until the [winning objective](#winning-objective) is met by a player.
+The game is played in a continuous series of [Rounds](#round-breakdown) until the [winning objective](#winning) is met by a player.
 
-##### Round Breakdown
+#### Round Breakdown
 
 A round consists of:
 
 1. The Flop: 
   1. Deal: Deal three cards from the deck to the field.
-  1. Resolve Age Change: If any of the three cards is a Joker, move it off to the side opposite the deck and replace it with a new card from the deck. If a joker is already present there, then place both jokers in the discard pile. 
+  1. Resolve Age Change: If any of the three cards is a Joker, move it off to the side opposite the deck and replace it with a new card from the deck. If a joker is already present there, then place both jokers in the discard pile.
+  ```
+               Ace 2   Ace 1
+               Down     Up
+           
+The              The Field          _________
+Deck     Card 1 | Card 2 | Card 3   | Joker |
+Down       Up   |   Up   |   Up
+
+               Ace 1   Ace 2
+                Up     Down
+```
 1. Determine the Current Age: 
   - "Age of Uprising" if the Joker is __not__ present.
   - "Age of Oppression" if the Joker __is__ present.
