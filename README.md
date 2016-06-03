@@ -24,7 +24,7 @@ Two royal families race to destroy each other. An open source table top game tha
     - Player Two starts with both red castles placed in front of them—**Heart face up and Diamond face down**. The Heart castle starts fully developed and the Diamond castle is not yet developed.
 1. Shuffle the remaining deck and place the deck to the side, face down. 
 1. Deal the first round's flop—face up—between the two players. This is "The Field".
-1. Final Setup should look as like this:
+1. Final setup should look as like this:
 
 ```
                Ace 2   Ace 1
@@ -40,11 +40,11 @@ Down       Up   |   Up   |   Up
 
 ### Winning
 
-A player wins when their opponent has no active castles. Active Castle means it not not being developed and not destroyed.
+A player wins when their opponent has no active castles. Active Castle means it not being developed and not destroyed.
 
 ### Game Play
 
-The game is played in an continuous series of rounds until the winning objective is met by a winning player.
+The game is played in a continuous series of [Rounds](#round-breakdown) until the [winning objective](#winning-objective) is met by a player.
 
 ##### Round Breakdown
 
