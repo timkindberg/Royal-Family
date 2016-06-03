@@ -50,7 +50,7 @@ The game is played in a continuous series of [Rounds](#round-breakdown) until th
 
 #### Round Breakdown
 
-A round consists of:
+A round consists of a flop and three (3) turns. Or in more detail:
 
 1. The "Flop": 
   1. Deal: Deal three cards from the deck to the field.
