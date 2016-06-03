@@ -78,6 +78,16 @@ A round consists of:
 
 ### Actions
 
+The following actions are allowed:
+
+- [Field](#field)
+- [Number Card Actions](#number-car-actions-3-10)
+  - [Pursuade or Threaten](#pursuade-or-threaten)
+  - [Defend](#defend)
+  - [Attack](#attack)
+- [Royal Family Card Actions](#royal-family-card-actions-king-queen-jack)
+- [Assassin Card Actions](#assassin-card-actions-2)
+
 #### Field
 
 Any card can be fielded.
@@ -90,16 +100,12 @@ Any card can be fielded.
 
 Number cards (except 2s) can be used to perform a variety of actions:
 
-- [Pursuade or Threaten](#pursuade-or-threaten)
-- [Defend](#defend)
-- [Attack](#attack)
-
 ##### Pursuade or Threaten
 
 Your alliance needs some pursuasion to convince them to war with you. Once pursuaded it will give you access to all of it's soldiers. You can perform all the same actions with your alliance kingdom that you can with your own. On the flip side, you can threaten your opponent's alliance. Intimidate them to prevent them from joining in the war.
 
-1. **Pursuade Your Alliance:** Place a card that matches your alliance suit on top of your alliance's inactive face down castle. The number on the card represent the amount of pursuasion points applied to your alliance. Once you place at least twenty (20) pursuasion points on your alliance castle it becomes active—flip the castle face up and discard all pursuasion and threat cards. An active castle can no longer be threatened, they are in it to win it, victory or death!
-1. **Threaten Your Opponent's Alliance:** Place a card that matches any of your active castle suits on your opponent alliance's face down castle. Threat points cancel out pursuasion. If you cancel out all pursuasion, discard all the pursuasion and threat cards.
+- **Pursuade Your Alliance:** Place a card that matches your alliance suit on top of your alliance's inactive face down castle. The number on the card represent the amount of pursuasion points applied to your alliance. Once you place at least twenty (20) pursuasion points on your alliance castle it becomes active—flip the castle face up and discard all pursuasion and threat cards. An active castle can no longer be threatened, they are in it to win it, victory or death!
+- **Threaten Your Opponent's Alliance:** Place a card that matches any of your active castle suits on your opponent alliance's face down castle. Threat points cancel out pursuasion. If you cancel out all pursuasion, discard all the pursuasion and threat cards.
 
 > Squaring Up Points: If at any time you can discard an even amount of pursuasion (+) and threat (-) point cards, do so. E.g. There is +9 and -9. Discard both cards since they cancel each other out. E.g. There is +4, +5, and -9. Discard all three cards, since they also cancel out. Otherwise, just keep all cards there and keep a running total.
 
@@ -107,16 +113,16 @@ Your alliance needs some pursuasion to convince them to war with you. Once pursu
 
 Defense is represented by "Fortifications"—a wall of soldiers standing in defense of your castle. Fortifications must match the suit of the castle they are defending. They will help protect against future attacks. The larger the number on the card, the stronger its defense. You may only have one (1) active fortification per castle at any time. Different defense options are:
 
-1. **Fortify a castle:** Place the card above the castle with matching suit. Place it sideways to signify a wall.
-1. **Upgrade a Fortification:** You may upgrade a fortification by replacing it with a higher number card (still of matching castle suit). The old card is discard.
-1. **Repair a Fortification:** You may repair a damaged fortification by replacing it and all damage with a new fortification card (still of matching castle suit). The old card and damage cards are all discarded.
+- **Fortify a castle:** Place the card above the castle with matching suit. Place it sideways to signify a wall.
+- **Upgrade a Fortification:** You may upgrade a fortification by replacing it with a higher number card (still of matching castle suit). The old card is discard.
+- **Repair a Fortification:** You may repair a damaged fortification by replacing it and all damage with a new fortification card (still of matching castle suit). The old card and damage cards are all discarded.
 
 ##### Attack
 
 Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. Different attack options are:
 
-1. **Battle:** Place a card that matches any of your active castle suits on top of an opponent's fortification. Orient the card such that it covers up the number of suit symbols from the attack card (e.g. A fort of 9 of spades is attacked by an army of 5 of hearts, so place the 5 on top of the 9, but only cover 5 of the spades). If the total soldiers placed are equal to or greater than the fortification soldiers, then discard all fortification and attacking soldier cards.
-1. **Raid a Castle:** If an opponent castle has no fortification, then you can raid it. Use a card that matches any of your active castle suits, if the castle you are attacking from does not have any royal family within then just discard the card, otherwise read "Permanent Damage" bullet below. You always have the chance to do Permanent Damage, but you can also choose one of either Kidnap, Rescue or Kill.
+- **Battle:** Place a card that matches any of your active castle suits on top of an opponent's fortification. Orient the card such that it covers up the number of suit symbols from the attack card (e.g. A fort of 9 of spades is attacked by an army of 5 of hearts, so place the 5 on top of the 9, but only cover 5 of the spades). If the total soldiers placed are equal to or greater than the fortification soldiers, then discard all fortification and attacking soldier cards.
+- **Raid a Castle:** If an opponent castle has no fortification, then you can raid it. Use a card that matches any of your active castle suits, if the castle you are attacking from does not have any royal family within then just discard the card, otherwise read "Permanent Damage" bullet below. You always have the chance to do Permanent Damage, but you can also choose one of either Kidnap, Rescue or Kill.
   - **Permanent Damage:** You can permanently damage the castle if attacking with a castle that has at least one royal family member present. Place the card next to the raided castle. That castle now has that much damage and it cannot be removed. Once there is at least twenty (20) damage on a castle, permanently remove from the game the castle, any family members within, and any applied damage cards. That castle is no longer active.
   - **Kidnap:** Take one (1) of the castle's family members and place it below one of your active castles (in the dungeon). Only one (1) kidnapped prisoner allowed at a time. If there is already a kidnapped prisoner, replace it and release the old prisoner to the field.
   - **Rescue:** If there are any of your family members in the attacked castle's dungeon, rescue one (1) and place it in its matching castle.
@@ -124,7 +130,7 @@ Attack with an army of soldiers. You can command your soldiers to attack your op
 
 #### Royal Family Card Actions (King, Queen, Jack):
 
-1. **Bring to Power:** If the card matches the suit of an active castle in your possession, you may place it in on top of that castle (leave the Ace showing a bit out the top of the face card). Having at least one family member allows you to deal permanent damage to your opponent castles.
+- **Bring to Power:** If the card matches the suit of an active castle in your possession, you may place it in on top of that castle (leave the Ace showing a bit out the top of the face card). Having at least one family member allows you to deal permanent damage to your opponent castles.
 
 #### Assassin Card Actions (2)
 
