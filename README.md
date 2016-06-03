@@ -78,13 +78,13 @@ A round consists of:
 
 ### Actions
 
-##### Field
+#### Field
 
 1. **Field:** If the player doesn't want to, or can't do anything else, they __must__ "field" the card. To "Field", place the card face-up on one of the three field piles.
 
 > Fielding can actually be a major part of the game. It's often wise to pick up a card for the sole purpose of discarding it to cover up a powerful opponent card that you don't want them to draw.
 
-##### Number Card Actions (3–10):
+#### Number Card Actions (3–10):
 
 Number cards (except 2s) can be used to perform a variety of actions:
 
@@ -92,7 +92,7 @@ Number cards (except 2s) can be used to perform a variety of actions:
 - [Defend](#defend)
 - [Attack](#attack)
 
-###### Pursuade or Threaten
+##### Pursuade or Threaten
 
 Your alliance needs some pursuasion to convince them to war with you. Once pursuaded it will give you access to all of it's soldiers. You can perform all the same actions with your alliance kingdom that you can with your own. On the flip side, you can threaten your opponent's alliance. Intimidate them to prevent them from joining in the war.
 
@@ -101,7 +101,7 @@ Your alliance needs some pursuasion to convince them to war with you. Once pursu
 
 > Squaring Up Points: If at any time you can discard an even amount of pursuasion (+) and threat (-) point cards, do so. E.g. There is +9 and -9. Discard both cards since they cancel each other out. E.g. There is +4, +5, and -9. Discard all three cards, since they also cancel out. Otherwise, just keep all cards there and keep a running total.
 
-###### Defend
+##### Defend
 
 Defense is represented by "Fortifications"—a wall of soldiers standing in defense of your castle. Fortifications must match the suit of the castle they are defending. They will help protect against future attacks. The larger the number on the card, the stronger its defense. You may only have one (1) active fortification per castle at any time. Different defense options are:
 
@@ -109,7 +109,7 @@ Defense is represented by "Fortifications"—a wall of soldiers standing in defe
 1. **Upgrade a Fortification:** You may upgrade a fortification by replacing it with a higher number card (still of matching castle suit). The old card is discard.
 1. **Repair a Fortification:** You may repair a damaged fortification by replacing it and all damage with a new fortification card (still of matching castle suit). The old card and damage cards are all discarded.
 
-###### Attack
+##### Attack
 
 Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. Different attack options are:
 
@@ -124,7 +124,7 @@ Attack with an army of soldiers. You can command your soldiers to attack your op
 
 1. **Bring to Power:** If the card matches the suit of an active castle in your possession, you may place it in on top of that castle (leave the Ace showing a bit out the top of the face card). Having at least one family member allows you to deal permanent damage to your opponent castles.
 
-##### Assassin Card Actions (2)
+#### Assassin Card Actions (2)
 
 - **Assassinate:** If you draw the assassin from the field and if your opponent has at least one family member in a castle you can play this card to assassinate one (1) family member. Discard the killed family member and assassin.
 - **SURPRISE!** If you draw the assassin from the deck, then it's not good for you. The assassin was sent to kill one of your family members. Discard one (1) family member (own or alliance) and the assassin.
