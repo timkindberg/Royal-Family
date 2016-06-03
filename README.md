@@ -27,6 +27,8 @@ Two royal families race to destroy each other. An open source table top game tha
 1. Final setup should look as like this (^ is face up, v is face down):
 
 ```
+                        Player
+                      
                      Ace 2   Ace 1
                        v       ^
            
@@ -36,6 +38,8 @@ Card   Deck     Card 1 | Card 2 | Card 3
 
                      Ace 1   Ace 2
                        ^       v
+                       
+                        Player
 ```
 
 ### Winning
