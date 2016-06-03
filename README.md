@@ -17,7 +17,7 @@ Two royal families race to destroy each other. An open source table top game tha
 1. Get a normal 52 count card deck. Keep the Jokers in the deck.
 1. Each player starts with two castles of the same color (Ace cards):
   - Player One (Black):
-    - The Starless family, their crest is the Spade &#9824;️️. The crest of their alliance family is the Diamond &#9827;.
+    - The Starless family, their crest is the Spade &#9824;️️. The crest of their alliance family is the Club &#9827;.
     - Player One starts with both black castles placed in front of them—**Spade face up and Club face down**. The Spade castle starts fully developed and the Club castle is not yet developed.
   - Player Two (Red):
     - The Scarlett family, their primary crest is the Heart &#9825;. The crest of their alliance family is the Diamond &#9826;.
