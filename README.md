@@ -8,7 +8,7 @@ Two royal families race to destroy each other. An open source table top game tha
 
 - Aces are Castles
 - King, Queen, Jack are Royal Family Members
-- 3–10 can be various, i.e. Soldiers, Damage Points, Pursuasion/Threat Points
+- 3–10 can be various, i.e. Soldiers, Pursuasion/Threat Points
 - 2 is an Assassin
 - Joker toggles the [Age](#round-breakdown)
 
@@ -78,14 +78,19 @@ A round consists of:
 
 ### Actions
 
-##### Number Card Actions (2–10):
+##### Field
 
-Number cards can be used to perform a variety of actions:
+1. **Field:** If the player doesn't want to, or can't do anything else, they __must__ "field" the card. To "Field", place the card face-up on one of the three field piles.
+
+> Fielding can actually be a major part of the game. It's often wise to pick up a card for the sole purpose of discarding it to cover up a powerful opponent card that you don't want them to draw.
+
+##### Number Card Actions (3–10):
+
+Number cards (except 2s) can be used to perform a variety of actions:
 
 - [Pursuade or Threaten](#pursuade-or-threaten)
 - [Defend](#defend)
 - [Attack](#attack)
-- [Field](#field)
 
 ###### Pursuade or Threaten
 
@@ -106,57 +111,20 @@ Defense is represented by "Fortifications"—a wall of soldiers standing in defe
 
 ###### Attack
 
-Attack with an army of soldiers. You can command your armies to attack your opponent. If your opponent has fortifications then you must destroy those first before you can apply permanent damage to their castles. Different attack options are:
+Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. Different attack options are:
 
-1. **Attack a Fortification:** 
-1. **Attack a Castle:** You must have at least one family member present in your castle to be able to attack. If you do, then if you've drawn a number card that matches the suit of an **opponent castle**, you can declare an attack on the other player's castle. Hand them the card and have them resolve the attack, see next sub-section.
-  - **Resolving an Attack:** The attacked player resolves the attack. They either:
-    - **Defend:** Use a number card that is currently fortifying the attacked castle to cancel out the attack. The fortification card must be equal or greater than the attack number card.
-    - **Take Castle Damage:** If the player cannot **Defend** then they place the attack number card to the side of the castle card. The castle now has that number of damage. When a castle take twenty (20) damage it is destroyed. The attacker can then choose one of two optional bonus actions:
-      - **Rescue:** If there are any kidnapped family members in the attacked castle, rescue one (1) and place it in their castle.
-      - **Injure:** If there are any opponent family members living in the attacked castle, choose one (1) and place it in one of the three face-up discard piles. 
+1. **Battle:** Place a card that matches any of your active castle suits on top of an opponent's fortification. Orient the card such that it covers up the number of suit symbols from the attack card (e.g. A fort of 9 of spades is attacked by an army of 5 of hearts, so place the 5 on top of the 9, but only cover 5 of the spades). If the total soldiers placed are equal to or greater than the fortification soldiers, then discard all fortification and attacking soldier cards.
+1. **Raid a Castle:** If an opponent castle has no fortification, then you can raid it. Use a card that matches any of your active castle suits, if the castle you are attacking from does not have any royal family within then just discard the card, otherwise read "Permanent Damage" bullet below. You always have the chance to do Permanent Damage, but you can also choose one of either Kidnap, Rescue or Kill.
+  - **Permanent Damage:** You can permanently damage the castle if attacking with a castle that has at least one royal family member present. Place the card next to the raided castle. That castle now has that much damage and it cannot be removed. Once there is at least twenty (20) damage on a castle, permanently remove from the game the castle, any family members within, and any applied damage cards. That castle is no longer active.
+  - **Kidnap:** Take one (1) of the castle's family members and place it below one of your active castles (in the dungeon). Only one (1) kidnapped prisoner allowed at a time. If there is already a kidnapped prisoner, replace it and release the old prisoner to the field.
+  - **Rescue:** If there are any of your family members in the attacked castle's dungeon, rescue one (1) and place it in its matching castle.
+  - **Kill:** You can kill a family member living in the attacked castle IF you have a family member of equal or greater station than the one you'd like to kill (e.g. King can kill any, Queen kills Queen and Jack, Jack kills only Jack). Discard the killed family member card. If you cannot kill, consider kidnapping instead, as it's rules are more lenient.
 
-###### Field
+#### Royal Family Card Actions (King, Queen, Jack):
 
-1. **Field:** If the player doesn't want to, or can't do anything else, they __must__ "field" the card. To "Field", place the card face-up on one of the three field piles.
+1. **Bring to Power:** If the card matches the suit of an active castle in your possession, you may place it in on top of that castle (leave the Ace showing a bit out the top of the face card). Having at least one family member allows you to deal permanent damage to your opponent castles.
 
-> Fielding can actually be a major part of the game. It's often wise to pick up a card for the sole purpose of discarding it to cover up a powerful opponent card that you don't want them to draw.
+##### Assassin Card Actions (2)
 
-##### Royal Family Card Actions (King, Queen, Jack):
-1. **Bring Home:** If the card **matches the suit of a castle in your possession**, you may place it in on top of **that** castle (leave the Ace showing a bit out the top of the face card). That family member adds one of the following benefits:
-  - **King - "Morale"**: When the King is home the whole kingdom gets a morale boost.
-    - The defending army fights harder. **All of your fortifications gain +2 in the king's matching castle.** 
-    - The alliance army helps defend. **You may use your alliance family cards to fortify the king's matching castle.**
-  - **Queen - "Hospitality"** - The Queen is a master of politics.
-    - The Queen knows that even in war you must treat your enemies with respect. She treats the kidnapped royal family members as they deserve; like royalty. **You may kidnap up to three opponent family members in the queen's matching castle instead of just one.**
-    - The Queen casts doubt into the alliance of her enemy. **The opponent's alliance cards are affected ???**
-  - **Jack - "Cunning"** - The Prince's youthful cunning nature extends to his war plans.
-    - His strategies are flexible and make use of deceitful and creative attacks. **You can attack with either suit of the opponent's color.**
-    - His attacks are fierce: **All attacks of the suit matching the attacked castle gain +1.**
-2. **Kidnap:** If the card **matches the suit of an opponent castle**, you may place it below (not under) one of your castles. You may only kidnap one person per castle (unless you have the Queen). If you already have the max allowed kidnapped, you can choose which to keep kidnapped and which to release (discard). The opponent will have a chance to rescue the family member when they attack. Read the Attack section.
-3. **Discard:** If you don't want to or can't do the other actions, then you may place the card on one of the three face-up piles between the two castles.
-
-##### Castle Card Actions (Ace)
-
-Take one of the following actions:
-
-- **Inspire Another Kingdom + Extra Turn:** If the suit is your alliance family's suit, you may place it next to your first castle. Then take an extra turn. You now have two castles. You can do all the things to the 2nd that you could do to the first. The opponent must now destroy both to win.
-- **Discard + Extra Turn:** If the suit **matches your opponent color** you discard it. Then take an extra turn. Perhaps this is a good chance to cover that castle up with another card ;) but you don't have to.
-
-##### Assassin Card Actions (Joker)
-
-- **Assassinate + Extra Turn:** If the opponent has at least one family member in a castle you can play this card to assassinate that person. You must discard the assassinated family member to one of the piles. Then **permanently** discard the Joker. Take an extra turn. Perhaps cover that face card up ;)
-- **Discard + Extra Turn:** If the opponent does not have any family members to assassinate then discard the Joker to one of the three face-up piles. Take an extra turn.
-
-### Rules I'm Questioning:
-
-- All number based rules are up for tweaking: 20hp for castles, +2 king bonus, etc.
-- Needing at least 1 family member to be able to attack. I wonder if they should need zero instead. It's worth trying both ways and see which is better.
-- Attacking requires the suit of the castle you want to attack. I wonder if an attack should be made with the suit that matches the own player's castle. This way the player must choose between fortification and attacking, but then we may need better options for all the other suits.
-- At the start both clubs and diamonds can really only be discarded. It's minorly helpful because you can cover up cards that your opponent may want but there may be more interesting options we could think of.
-  - Perhaps, for example, if you are Hearts you could use the other red color, Diamonds, to start building the foundation of your new castle. If you collect a pattern or sum then you get to find and take out the Diamond Ace and build your castle. The pattern could be 3-card straight, or maybe a sum of 10 or 15 or something, or just 5? of any diamond card.
-- The jack's benefit becomes less special once the player has two castles
-- Even allowing building of another castle, I'm pretty blurry about how that will affect overall game play.
-- Maybe the King's "Morale" benefit should allow both suits as fortifications instead of +2. This would balance the Jack's attack benefit that allows both suits.
-- The various rules around discarding cards and covering them up are troublesome, because then the next player can choose to uncover the card, but then the next player can just cover it up again. There can be an infinite loop of cover then uncover until someone just gives up.
-- Any rule really...
+- **Assassinate:** If you draw the assassin from the field and if your opponent has at least one family member in a castle you can play this card to assassinate one (1) family member. Discard the killed family member and assassin.
+- **SURPRISE!** If you draw the assassin from the deck, then it's not good for you. The assassin was sent to kill one of your family members. Discard one (1) family member (own or alliance) and the assassin.
