@@ -80,7 +80,9 @@ A round consists of:
 
 #### Field
 
-1. **Field:** If the player doesn't want to, or can't do anything else, they __must__ "field" the card. To "Field", place the card face-up on one of the three field piles.
+Any card can be fielded.
+
+**Field:** If the player doesn't want to, or can't do anything else, they __must__ "field" the card. To "Field", place the card face-up on one of the three field piles.
 
 > Fielding can actually be a major part of the game. It's often wise to pick up a card for the sole purpose of discarding it to cover up a powerful opponent card that you don't want them to draw.
 
