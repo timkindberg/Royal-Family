@@ -75,6 +75,8 @@ A round consists of a flop and three (3) turns. Or in more detail:
 1. Players take their turns determined by the turn order.
 1. End of Round
 
+> If you have trouble keeping track of who's turn it is and when to flop, use some tokens (e.g. dice, coins, lint). Have two similar tokens and one that is different (e.g. dime, dime, quarter). When you determine turn order, the person that gets two turns takes the different token and one of the similar ones. Then when taking turns you push your tokens to the middle: Player one goes (pushes dime in), Player two goes (pushes dime in), Player one goes again (pushes quarter in). This way it's always clear where you are in the turn order.
+
 #### Turn Breakdown:
 
 1. Draw: Take any one card from any one of the field piles or the deck. If the deck or some field piles are empty, just draw from another pile that has cards.
@@ -106,10 +108,10 @@ Number cards (except 2s) can be used to perform a variety of actions:
 
 ##### Pursuade or Threaten
 
-Your alliance needs some pursuasion to convince them to war with you. Once pursuaded it will give you access to all of it's soldiers. You can perform all the same actions with your alliance kingdom that you can with your own. On the flip side, you can threaten your opponent's alliance. Intimidate them to prevent them from joining in the war.
+Your alliance needs some pursuasion to convince them to war with you. Once pursuaded they will help attack your opponent and will defend themselves. You can perform all the same actions with your alliance kingdom that you can with your own. On the flip side, you can threaten your opponent's alliance. Intimidate them to prevent them from joining in the war.
 
 - **Pursuade Your Alliance:** Place a card that matches your alliance suit on top of your alliance's inactive face down castle. The number on the card represent the amount of pursuasion points applied to your alliance. Once you place at least twenty (20) pursuasion points on your alliance castle it becomes active—flip the castle face up and discard all pursuasion and threat cards. An active castle can no longer be threatened, they are in it to win it, victory or death!
-- **Threaten Your Opponent's Alliance:** Place a card that matches any of your active castle suits on your opponent alliance's face down castle. Threat points cancel out pursuasion. If you cancel out all pursuasion, discard all the pursuasion and threat cards.
+- **Threaten Your Opponent's Alliance:** Place a card that matches your primary castle suit on your opponent alliance's face down castle. Threat points cancel out pursuasion. If you cancel out all pursuasion (equal or greater), discard all the pursuasion and threat cards.
 
 > Squaring Up Points: If at any time you can discard an even amount of pursuasion (+) and threat (-) point cards, do so. E.g. There is +9 and -9. Discard both cards since they cancel each other out. E.g. There is +4, +5, and -9. Discard all three cards, since they also cancel out. Otherwise, just keep all cards there and keep a running total.
 
@@ -121,16 +123,23 @@ Defense is represented by "Fortifications"—a wall of soldiers standing in defe
 - **Upgrade a Fortification:** You may upgrade a fortification by replacing it with a higher number card (still of matching castle suit). The old card is discard.
 - **Repair a Fortification:** You may repair a damaged fortification by replacing it and all damage with a new fortification card (still of matching castle suit). The old card and damage cards are all discarded.
 
+> If you had pursuaded your alliance to fight and then one castle is defeated, the soldiers from the defeated castle can be used to fortify, upgrade or repair the remaining castle.
+
 ##### Attack
 
-Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. Different attack options are:
+Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. 
+
+> If you had pursuaded your alliance to fight and then one castle is defeated, the soldiers from the defeated castle can still be used to battle and raid the opponent's castle, including applying permanent damage.
+
+Different attack options are:
 
 - **Battle:** Place a card that matches any of your active castle suits on top of an opponent's fortification. Orient the card such that it covers up the number of suit symbols from the attack card (e.g. A fort of 9 of spades is attacked by an army of 5 of hearts, so place the 5 on top of the 9, but only cover 5 of the spades). If the total soldiers placed are equal to or greater than the fortification soldiers, then discard all fortification and attacking soldier cards.
-- **Raid a Castle:** If an opponent castle has no fortification, then you can raid it. Use a card that matches any of your active castle suits, if the castle you are attacking from does not have any royal family within then just discard the card, otherwise read "Permanent Damage" bullet below. You always have the chance to do Permanent Damage, but you can also choose one of either Kidnap, Rescue or Kill.
-  - **Permanent Damage:** You can permanently damage the castle if attacking with a castle that has at least one royal family member present. Place the card next to the raided castle. That castle now has that much damage and it cannot be removed. Once there is at least twenty (20) damage on a castle, permanently remove from the game the castle, any family members within, and any applied damage cards. That castle is no longer active.
-  - **Kidnap:** Take one (1) of the castle's family members and place it below one of your active castles (in the dungeon). Only one (1) kidnapped prisoner allowed at a time. If there is already a kidnapped prisoner, replace it and release the old prisoner to the field.
-  - **Rescue:** If there are any of your family members in the attacked castle's dungeon, rescue one (1) and place it in its matching castle.
-  - **Kill:** You can kill a family member living in the attacked castle IF you have a family member of equal or greater station than the one you'd like to kill (e.g. King can kill any, Queen kills Queen and Jack, Jack kills only Jack). Discard the killed family member card. If you cannot kill, consider kidnapping instead, as it's rules are more lenient.
+- **Raid a Castle:** If an opponent castle has no fortification, then you can raid it. Use a card that matches any of your active castle suits, if the castle you are attacking from does not have any royal family within then just discard the card, otherwise read "Permanent Damage" bullet below. You always have the chance to do Permanent Damage, and you can also choose one of either Kidnap, Rescue or Kill.
+  - **Permanent Damage:** You can permanently damage the castle if attacking with a castle that has at least one royal family member present. Place the card next to the raided castle. That castle now has that much damage and it cannot be removed. Once there is at least twenty (20) damage on a castle, it is defeated; permanently remove from the game the castle, any family members within, and any applied damage cards. That castle is no longer active. All of the defeated castle's soldier may still be used to attack their opponent, and additionally they may be used to defend (fortify, upgrade, repair) the remaining alliance castle.
+  - **Kill, Kidnap, or Rescue (Choose one):**
+    - **Kill:** You can kill one (1) family member living in the raided castle ONLY IF you have a family member of equal or greater station than the one you'd like to kill (e.g. King can kill any, Queen kills Queen and Jack, Jack kills only Jack). Discard the killed family member card.
+    - **Kidnap:** Same rules as Kill, but instead of discarding the family member card, place it below one of your active castles (in the dungeon). Only one (1) kidnapped prisoner is allowed per castle at a time. If there is already a kidnapped prisoner, replace it and release the old prisoner to the field.
+    - **Rescue:** If there are any of your family members in the attacked castle's dungeon, rescue one (1) and place it in its matching castle.
 
 #### Royal Family Card Actions (King, Queen, Jack):
 
