@@ -75,7 +75,7 @@ A round consists of a flop and three (3) turns. Or in more detail:
 1. Players take their turns determined by the turn order.
 1. End of Round
 
-> If you have trouble keeping track of who's turn it is and when to flop, use some tokens (e.g. dice, coins, lint). Have two similar tokens and one that is different (e.g. dime, dime, quarter). When you determine turn order, the person that gets two turns takes the different token and one of the similar ones. Then when taking turns you push your tokens to the middle: Player one goes (pushes dime in), Player two goes (pushes dime in), Player one goes again (pushes quarter in). This way it's always clear where you are in the turn order.
+> If you have trouble keeping track of who's turn it is and when to flop, use some tokens (e.g. dice, coins, lint). Have two similar tokens and one that is different (e.g. dime, dime, quarter). E.g. When you determine turn order, the person that gets two turns takes the quarter and dime. The other player takes the other dime. Then when taking turns they push the tokens to the middle like so: Player one goes (pushes dime in), Player two goes (pushes dime in), Player one goes again (pushes quarter in). The dime always represents the extra turn. This way it's always clear where you are in the turn order.
 
 #### Turn Breakdown:
 
