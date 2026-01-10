@@ -87,7 +87,7 @@ A round consists of a flop and three (3) turns. Or in more detail:
 The following actions are allowed:
 
 - [Field](#field)
-- [Number Card Actions](#number-car-actions-3-10)
+- [Number Card Actions](#number-card-actions-3-10)
   - [Pursuade or Threaten](#pursuade-or-threaten)
   - [Defend](#defend)
   - [Attack](#attack)
@@ -113,7 +113,7 @@ Your alliance needs some pursuasion to convince them to war with you. Once pursu
 - **Pursuade Your Alliance:** Place a card that matches your alliance suit on top of your alliance's inactive face down castle. The number on the card represent the amount of pursuasion points applied to your alliance. Once you place at least twenty (20) pursuasion points on your alliance castle it becomes active—flip the castle face up and discard all pursuasion and threat cards. An active castle can no longer be threatened, they are in it to win it, victory or death!
 - **Threaten Your Opponent's Alliance:** Place a card that matches your primary castle suit on your opponent alliance's face down castle. Threat points cancel out pursuasion. If you cancel out all pursuasion (equal or greater), discard all the pursuasion and threat cards.
 
-> Squaring Up Points: If at any time you can discard an even amount of pursuasion (+) and threat (-) point cards, do so. E.g. There is +9 and -9. Discard both cards since they cancel each other out. E.g. There is +4, +5, and -9. Discard all three cards, since they also cancel out. Otherwise, just keep all cards there and keep a running total.
+> **Squaring Up Points (Housekeeping Rule):** Whenever you add a pursuasion or threat card, if you can find any combination of cards where pursuasion points exactly equal threat points, discard those matched cards. Try to discard as many cards as possible. This frees up stuck cards to be recycled back into the deck. E.g. You have +4 and +5 pursuasion, then add a -4 threat → discard the +4 and -4 (leaving +5). E.g. You have +4, +5, and +10 pursuasion, then add -9 threat → discard +4, +5, and -9 (since 4+5=9, leaving +10). E.g. You have -7 threat, then add +5 pursuasion → since total threat (7) is greater than total pursuasion (5), discard all cards via the Threatening rule above.
 
 ##### Defend
 
@@ -127,9 +127,11 @@ Defense is represented by "Fortifications"—a wall of soldiers standing in defe
 
 ##### Attack
 
-Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed. 
+Attack with an army of soldiers. You can command your soldiers to attack your opponent. If your targeted castle has a fortification then you must destroy it first before you can apply permanent damage to the castle. Once you have done twenty (20) damage to a castle it is destroyed.
 
 > If you had pursuaded your alliance to fight and then one castle is defeated, the soldiers from the defeated castle can still be used to battle and raid the opponent's castle, including applying permanent damage.
+
+> **⚑ Important:** Once an alliance castle is activated (persuaded to join the war), its soldiers can continue to attack and defend even if the castle is later destroyed! The soldiers fight on until victory or defeat.
 
 Different attack options are:
 
