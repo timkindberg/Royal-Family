@@ -756,9 +756,21 @@ class GameState {
             } else {
               // Can do permanent damage if attacking castle has royals (even if castle is destroyed)
               if (matchingAttackCastle.hasRoyalFamily) {
+                // Raids with permanent damage are always allowed
                 actions.push({ type: 'raid', label: `Raid ${SUIT_NAMES[castle.suit]} castle`, castle, attackingCastle: matchingAttackCastle, enabled: true });
               } else {
-                actions.push({ type: 'raid-no-damage', label: `Raid ${SUIT_NAMES[castle.suit]} castle (no permanent damage)`, castle, enabled: true });
+                // No permanent damage - only allow if there are follow-up actions
+                const hasFollowUp = this.hasRaidFollowUpActions(castle, matchingAttackCastle);
+                if (hasFollowUp) {
+                  actions.push({ type: 'raid-no-damage', label: `Raid ${SUIT_NAMES[castle.suit]} castle (no permanent damage)`, castle, enabled: true });
+                } else {
+                  actions.push({
+                    type: 'raid-no-damage',
+                    label: `Raid ${SUIT_NAMES[castle.suit]} castle`,
+                    enabled: false,
+                    reason: 'No permanent damage and no follow-up actions available'
+                  });
+                }
               }
             }
           } else if (inactiveMatchingCastle) {
@@ -1031,6 +1043,28 @@ class GameState {
       this.phase = 'draw';
       this.log(`--- ${this.currentPlayerObj.name}'s turn ---`);
     }
+  }
+
+  // Check if a raid would have follow-up actions (rescue, kill, or kidnap)
+  hasRaidFollowUpActions(raidedCastle, attackingCastle) {
+    const player = this.currentPlayerObj;
+
+    // Check for rescue
+    if (raidedCastle.prisoner && player.ownsCard(raidedCastle.prisoner)) {
+      return true;
+    }
+
+    // Check for kill/kidnap
+    const highestRoyal = attackingCastle.highestRoyal;
+    if (highestRoyal) {
+      for (const royal of raidedCastle.royalFamily) {
+        if (highestRoyal.canKill(royal)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   // Get raid action options
