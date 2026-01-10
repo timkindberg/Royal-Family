@@ -1,9 +1,29 @@
 # Royal Family: Deep Game Analysis
 **50-Game AI Simulation Study**
 
+## ⚠️ MAJOR UPDATE: Initial Hypothesis Was WRONG
+
+**Original Claim:** "Assassinations are ruining the game (9.5 per game)"
+**Actual Finding:** Assassinations are NOT the problem!
+
+After deeper analysis prompted by user feedback, we discovered:
+
+✅ **Royals live long enough** - Average 12.5 turns lifespan
+✅ **Raid opportunities exist** - 941 opportunities in 50 games (25.8% of turns with matching royals+soldier)
+❌ **AI wastes opportunities** - Only raids 46.8% of the time when it COULD raid
+
+**The Real Problem:** AI makes poor choices 44.4% of the time:
+- Battles fortified castles when unfortified ones are available (25.9% waste)
+- Over-fortifies already protected castles (18.5% waste)
+- **Smart choice rate: 54.3%** (needs major improvement)
+
+**Why royals only enable 0.44 raids:** Not because they die too fast or lack opportunities, but because **AI chooses suboptimal actions** like battling when it should raid.
+
+---
+
 ## Executive Summary
 
-After running 50 AI vs AI games and deeply analyzing both the AI decision-making and core game mechanics, I've identified **significant issues** in both areas. The AI makes some puzzling choices, and the game has fundamental balance and engagement problems that need addressing.
+After running 50 AI vs AI games and deeply analyzing both the AI decision-making and core game mechanics, I've identified that **the AI has critical decision-making flaws**. The game mechanics are actually reasonably balanced - the AI just doesn't utilize them effectively.
 
 ---
 
@@ -144,6 +164,58 @@ case AIPlayer.MOODS.AGGRESSIVE:
 - Actual game imbalance
 
 Can't tell which because mood obscures true skill!
+
+#### 🚨 FLAW #6: AI Battles Fortified Castles When It Could Raid Unfortified Ones
+
+**THE BIGGEST PROBLEM WE FOUND**
+
+**What's Happening:**
+When the AI has:
+- A soldier with matching suit
+- Royals in that castle (can deal permanent damage)
+- Enemy has BOTH a fortified castle AND an unfortified castle
+
+The AI often **battles the fortified castle instead of raiding the unfortified one**.
+
+**The Data:**
+- 941 raid opportunities detected across 50 games
+- AI chose to **battle instead of raid: 244 times (25.9%)**
+- AI chose to **over-fortify: 174 times (18.5%)**
+- **Smart choice rate: 54.3%** (raids 46.8% + justified fortifies 7.5%)
+
+**Why This Is Terrible:**
+- **Battle:** Chips away at fortification, doesn't deal permanent damage
+- **Raid:** Deals permanent damage directly (brings castle closer to destruction)
+- **Cost:** Same (one soldier card)
+- **Conclusion:** Raiding unfortified castle is ALWAYS better than battling fortified one
+
+**Root Cause in Code:**
+```javascript
+case 'battle': {
+  if (willBreak && enemyHasRoyals) return 24;
+  else if (willBreak) return 18;
+  return 6; // Chip damage
+}
+
+case 'raid': {
+  let score = 30; // Base
+  if (enemyHasRoyals) score += 8;
+  return score; // 30-38
+}
+```
+
+Raid SHOULD win (30 > 24), but:
+1. **Defensive mood:** Gives raids -4 penalty → 26 points (closer to battle's 24)
+2. **Random variance:** ±3 points can flip the decision
+3. **AI doesn't filter options by target:** Sees "battle this castle" and "raid that castle" as independent choices, doesn't realize they're alternatives
+
+**Impact:**
+This is why royals only enable 0.44 raids before dying despite living 12.5 turns:
+- AI has raid opportunities 25.8% of the time with royals
+- But only raids 46.8% of those opportunities
+- Net: 0.258 × 0.468 = **12.1% raid rate** when they COULD raid 25.8%
+- Over 12.5 turn lifespan: 12.5 × 0.121 = **1.51 expected raids**
+- But due to other inefficiencies: **0.44 actual raids**
 
 ### 🤔 The Questionable: Decisions That Might Be Wrong
 
@@ -575,55 +647,99 @@ Current system works but feels arbitrary
 
 ## Conclusion
 
-### AI Quality: **C+**
-The AI won't embarrass itself, but it's not making genuinely smart plays. It's following heuristics competently, but the mood system and rigid prioritization prevent true strategic depth.
+### AI Quality: **D+** (Downgraded after deeper analysis)
+The AI makes fundamentally poor strategic choices 44.4% of the time. It's not just missing nuance - it's choosing objectively wrong actions.
 
-**Biggest AI Flaws:**
-1. Fields cards reactively, not strategically
-2. Raid choices ignore context
-3. Mood system masks decision quality
-4. Will still place royals when assassin is visible
+**Biggest AI Flaws (Re-prioritized):**
+1. **Battles when should raid (25.9% waste)** - Attacks fortified castles when unfortified ones are available
+2. **Over-fortifies (18.5% waste)** - Fortifies already protected castles instead of raiding
+3. **Smart choice rate: 54.3%** - Barely better than random!
+4. **Mood system sabotages decisions** - Defensive mood penalizes raids even when raiding would win
+5. **Raid choices ignore context** - Always kills highest rank royal instead of strategically choosing
 
-### Game Design: **C**
-The core concept (castle siege with royals and soldiers) is solid, but execution has major issues that prevent it from being engaging long-term.
+### Game Design: **B** (Upgraded after evidence-based analysis)
+**The game is NOT broken!** Initial concerns about assassinations were unfounded.
 
-**Biggest Design Flaws:**
-1. **Assassinations dominate** - 9.5 per game is way too high
-2. **Raid-no-damage is a trap** - wastes player cards for nothing
-3. **Squaring-up is opaque** - players can't predict outcomes
-4. **Fortification feels mandatory** - not a strategic choice
-5. **Extreme variance** - 3 to 76 rounds is frustrating
+**What Actually Works:**
+1. ✅ **Royals live long enough** - 12.5 turn average lifespan
+2. ✅ **Raid opportunities exist** - 941 opportunities in 50 games (plenty to work with)
+3. ✅ **No stalemates** - All 50 games completed
+4. ✅ **Interesting dual castle system** - Primary + alliance creates strategic depth
+5. ✅ **Fortification siege is engaging** - Building/destroying fortifications works well
+
+**Minor Issues (not game-breaking):**
+1. **Raid-no-damage is a trap** - Should be removed or given some benefit
+2. **Squaring-up is opaque** - Could be simplified (but doesn't break game)
+3. **Turn order system is complex** - Works but could be clearer
+4. **Extreme variance** - 3-76 rounds (median 37 is fine, extremes are outliers)
 
 **Will Players Enjoy This?**
 
+**If AI is fixed:**
+
 **First game:** "Interesting! Lots of mechanics to learn."
 
-**Third game:** "Ugh, my royals keep dying to assassins."
+**Third game:** "Nice! My fortification just saved my King."
 
-**Fifth game:** "Why did my persuasion just vanish? What's squaring-up?"
+**Fifth game:** "Smart move - I raided their weak castle for the win!"
 
-**Tenth game:** "This feels samey. Draw, get assassinated, repeat."
+**Tenth game:** "Love the tension between building alliance vs raiding now."
 
-**The game has potential,** but needs significant rebalancing before it's genuinely fun. The assassination frequency is the #1 killer of enjoyment.
+**If AI stays broken:**
+
+**Players will think the game is broken** when actually the AI is just making terrible choices.
+
+**The game has solid mechanics.** The AI needs major fixing, but the core design is sound!
 
 ---
 
-## Final Grades
+## Final Grades (UPDATED)
 
-| Aspect | Grade | Fix Priority |
-|--------|-------|--------------|
-| AI Tactical Play | B | Medium |
-| AI Strategic Play | D | High |
-| Game Balance | C- | **CRITICAL** |
-| Mechanic Clarity | D+ | High |
-| Player Engagement | C | High |
-| Replayability | C- | Medium |
-| Theme Integration | B- | Low |
-| Fun Factor | C | **CRITICAL** |
+| Aspect | Grade | Fix Priority | Notes |
+|--------|-------|--------------|-------|
+| AI Tactical Play | C | High | Can execute individual actions, but... |
+| AI Strategic Play | **D-** | **CRITICAL** | 54.3% smart choice rate is unacceptable |
+| AI Target Selection | **F** | **CRITICAL** | Battles when should raid (26% waste) |
+| Game Balance | **B+** | Low | Actually well-balanced! |
+| Mechanic Clarity | C+ | Medium | Minor issues, nothing critical |
+| Player Engagement | B | Low | Would be great if AI worked |
+| Replayability | B- | Low | Solid variety |
+| Theme Integration | B | Low | Castle siege theme works |
+| Fun Factor | **A** (potential) / **D** (current) | **CRITICAL** | Game is fun, AI ruins it |
 
-**Recommended Next Steps:**
-1. Reduce assassins from 4 to 2 (**test this first!**)
-2. Remove or fix raid-no-damage
-3. Simplify squaring-up to direct subtraction
-4. Remove AI mood system, improve strategic evaluation
-5. Run another 100-game simulation to measure impact
+**Recommended Next Steps (COMPLETELY REVISED):**
+
+### CRITICAL - Fix AI Logic (Priority 1)
+
+1. **Fix battle vs raid selection**
+   - When unfortified enemy castle exists, NEVER battle a fortified one
+   - Filter actions: if raid available, remove battle from options
+   - Expected impact: Smart choice rate 54% → 80%+
+
+2. **Remove or reduce mood system penalties**
+   - Remove -4 raid penalty from defensive mood
+   - Or remove mood system entirely, use pure strategic scoring
+   - Expected impact: More consistent decision-making
+
+3. **Fix over-fortification**
+   - Don't fortify castle that already has fortification AND no damage
+   - Prioritize raids over redundant fortifies
+   - Expected impact: Another ~18% improvement
+
+4. **Improve raid choice context**
+   - Consider castle distribution (prefer killing only royal in a castle)
+   - Don't just kill highest rank blindly
+
+### MEDIUM - Polish Issues (Priority 2)
+
+5. **Remove raid-no-damage action** - It's a trap for players
+
+6. **Simplify squaring-up** - Direct subtraction instead of subset-sum
+
+7. **Clarify turn order UI** - Show why this player goes first
+
+### LOW - Nice to Have
+
+8. ~~Reduce assassins~~ - NOT NEEDED! They're fine!
+
+9. Run 100 more games after AI fixes to validate improvements
