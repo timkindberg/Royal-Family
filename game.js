@@ -172,16 +172,79 @@ class Castle {
   }
 
   squareUpPoints() {
-    // Per rules: "If at any time you can discard an even amount of persuasion (+) 
-    // and threat (-) point cards, do so."
-    // In practice: if threats cancel out all persuasion, discard both sets
+    // RULE 1: Threatening - if total threats >= total persuasion, discard everything
     if (this.totalThreats >= this.totalPersuasion && this.persuasionCards.length > 0) {
       const discarded = [...this.persuasionCards, ...this.threatCards];
       this.persuasionCards = [];
       this.threatCards = [];
       return discarded;
     }
+
+    // RULE 2: Squaring Up - find largest subset where persuasion sum == threat sum
+    // This frees up stuck cards to be recycled back into the deck
+    const match = this.findLargestMatchingSubsets();
+    if (match) {
+      // Remove matched cards
+      this.persuasionCards = this.persuasionCards.filter(
+        card => !match.persuasion.some(c => c.id === card.id)
+      );
+      this.threatCards = this.threatCards.filter(
+        card => !match.threat.some(c => c.id === card.id)
+      );
+      return [...match.persuasion, ...match.threat];
+    }
+
     return [];
+  }
+
+  findLargestMatchingSubsets() {
+    // Generate all possible subsets of persuasion and threat cards
+    const persuasionSubsets = this.generateSubsets(this.persuasionCards);
+    const threatSubsets = this.generateSubsets(this.threatCards);
+
+    let bestMatch = null;
+    let maxCards = 0;
+
+    // Find matching sums, prioritize most total cards
+    for (const pSubset of persuasionSubsets) {
+      if (pSubset.sum === 0 || pSubset.cards.length === 0) continue;
+
+      for (const tSubset of threatSubsets) {
+        if (tSubset.sum === 0 || tSubset.cards.length === 0) continue;
+
+        if (pSubset.sum === tSubset.sum) {
+          const totalCards = pSubset.cards.length + tSubset.cards.length;
+          if (totalCards > maxCards) {
+            maxCards = totalCards;
+            bestMatch = { persuasion: pSubset.cards, threat: tSubset.cards };
+          }
+        }
+      }
+    }
+
+    return bestMatch;
+  }
+
+  generateSubsets(cards) {
+    const subsets = [];
+    const n = cards.length;
+
+    // Generate all 2^n subsets using bit manipulation
+    for (let i = 0; i < (1 << n); i++) {
+      const subset = [];
+      let sum = 0;
+
+      for (let j = 0; j < n; j++) {
+        if (i & (1 << j)) {
+          subset.push(cards[j]);
+          sum += cards[j].numericValue;
+        }
+      }
+
+      subsets.push({ cards: subset, sum });
+    }
+
+    return subsets;
   }
 
   checkActivation() {
