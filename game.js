@@ -1440,12 +1440,13 @@ class AIPlayer {
       }
     }
 
-    // Fortify castle without royals - medium priority
+    // Fortify castle without royals - prepares for safe royal placement
+    // Should beat deck gamble (base 10) for reasonable cards
     if (card.suit === this.player.primarySuit && !primaryHasRoyals) {
-      score = Math.max(score, 8 + value * 0.2);
+      score = Math.max(score, 11 + value * 0.3);
     }
     if (card.suit === this.player.allianceSuit && this.player.allianceCastle.isActive && !allianceHasRoyals) {
-      score = Math.max(score, 8 + value * 0.2);
+      score = Math.max(score, 11 + value * 0.3);
     }
 
     // Attack/raid potential - check if we can do PERMANENT DAMAGE
