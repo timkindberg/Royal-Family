@@ -163,17 +163,19 @@ class Castle {
 
   addPersuasion(card) {
     this.persuasionCards.push(card);
-    this.squareUpPoints();
+    return this.squareUpPoints();
   }
 
   addThreat(card) {
     this.threatCards.push(card);
-    this.squareUpPoints();
+    return this.squareUpPoints();
   }
 
   squareUpPoints() {
-    // If threats >= persuasion, cancel out
-    if (this.totalThreats >= this.totalPersuasion) {
+    // Per rules: "If at any time you can discard an even amount of persuasion (+) 
+    // and threat (-) point cards, do so."
+    // In practice: if threats cancel out all persuasion, discard both sets
+    if (this.totalThreats >= this.totalPersuasion && this.persuasionCards.length > 0) {
       const discarded = [...this.persuasionCards, ...this.threatCards];
       this.persuasionCards = [];
       this.threatCards = [];
@@ -766,8 +768,13 @@ class GameState {
         break;
 
       case 'persuade':
-        player.allianceCastle.addPersuasion(card);
-        this.log(`${player.name} persuaded alliance (+${card.numericValue}, total: ${player.allianceCastle.netPersuasion}/20)`);
+        const persuadeSquared = player.allianceCastle.addPersuasion(card);
+        if (persuadeSquared.length > 0) {
+          this.discardPile.push(...persuadeSquared);
+          this.log(`${player.name} persuaded alliance (+${card.numericValue}) - threats cancelled out!`);
+        } else {
+          this.log(`${player.name} persuaded alliance (+${card.numericValue}, total: ${player.allianceCastle.netPersuasion}/20)`);
+        }
         const activated1 = player.allianceCastle.checkActivation();
         if (activated1.length > 0) {
           this.discardPile.push(...activated1);
@@ -776,8 +783,13 @@ class GameState {
         break;
 
       case 'threaten':
-        opponent.allianceCastle.addThreat(card);
-        this.log(`${player.name} threatened enemy alliance (+${card.numericValue} threat)`);
+        const threatSquared = opponent.allianceCastle.addThreat(card);
+        if (threatSquared.length > 0) {
+          this.discardPile.push(...threatSquared);
+          this.log(`${player.name} threatened enemy alliance (+${card.numericValue} threat) - persuasion cancelled out!`);
+        } else {
+          this.log(`${player.name} threatened enemy alliance (+${card.numericValue} threat)`);
+        }
         break;
 
       case 'fortify':
