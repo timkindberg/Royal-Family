@@ -50,7 +50,13 @@ body {
   background: var(--bg-dark);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* Desktop: prevent scrolling */
+}
+
+@media (max-width: 900px) {
+  body {
+    overflow: auto; /* Mobile: allow scrolling when content overflows */
+  }
 }
 
 /* Background pattern */
@@ -80,6 +86,13 @@ body::before {
   width: 100vw;
   height: 100vh;
   z-index: 1;
+}
+
+@media (max-width: 900px) {
+  .game-container {
+    height: auto; /* Allow container to expand on mobile */
+    min-height: 100vh; /* Ensure it fills the viewport at minimum */
+  }
 }
 
 /* Screens */
@@ -1135,22 +1148,49 @@ body::before {
     --card-width: 50px;
     --card-height: 70px;
   }
-  
+
   .game-title {
     font-size: 3rem;
   }
-  
+
   .message-log {
     display: none;
   }
-  
+
   .castles-row {
     gap: var(--gap-md);
   }
-  
+
   .castle-container {
     min-width: 140px;
     padding: var(--gap-sm);
+  }
+}
+
+/* Additional optimizations for smaller mobile screens */
+@media (max-width: 600px) {
+  :root {
+    --card-width: 45px;
+    --card-height: 63px;
+    --gap-sm: 6px;
+    --gap-md: 10px;
+  }
+
+  #game-screen {
+    padding: var(--gap-sm);
+  }
+
+  .player-area {
+    padding: var(--gap-sm);
+  }
+
+  .castle-container {
+    min-width: 120px;
+    padding: 6px;
+  }
+
+  .game-title {
+    font-size: 2.5rem;
   }
 }
 
