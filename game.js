@@ -881,10 +881,18 @@ class GameState {
           this.handleCastleDestroyed(target, opponent);
         } else {
           // Check for kill/kidnap/rescue options
-          this.phase = 'raid-choice';
           this.raidTarget = target;
           this.raidAttackingCastle = additionalTarget;
-          return; // Don't end turn yet
+
+          // Check if there are any meaningful actions (not just "Skip")
+          const options = this.getRaidOptions();
+          const hasActions = options.length > 1; // More than just "Skip"
+
+          if (hasActions) {
+            this.phase = 'raid-choice';
+            return; // Don't end turn yet
+          }
+          // Otherwise continue to end the turn normally
         }
         break;
 
