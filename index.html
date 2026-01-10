@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Royal Family - Card Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="game-container">
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen active">
+      <div class="title-content">
+        <div class="crest-decoration">⚔️</div>
+        <h1 class="game-title">Royal Family</h1>
+        <p class="tagline">Two royal families race to destroy each other</p>
+        <div class="title-divider"></div>
+        <div class="mode-selection">
+          <button id="vs-ai-btn" class="royal-btn">⚔️ Challenge the Crown</button>
+          <button id="vs-player-btn" class="royal-btn">👥 Two Players</button>
+        </div>
+        <button id="rules-btn" class="royal-btn secondary">Rules of Engagement</button>
+      </div>
+      <div class="title-footer">
+        <p>A strategic card game of royal warfare</p>
+      </div>
+    </div>
+
+    <!-- Rules Screen -->
+    <div id="rules-screen" class="screen">
+      <div class="rules-content">
+        <button id="back-to-title" class="back-btn">← Back</button>
+        <h2>Rules of Engagement</h2>
+        
+        <div class="rules-section">
+          <h3>🎯 Objective</h3>
+          <p>Destroy all of your opponent's active castles to win.</p>
+        </div>
+
+        <div class="rules-section">
+          <h3>🃏 Card Designations</h3>
+          <ul>
+            <li><strong>Aces</strong> — Castles</li>
+            <li><strong>K, Q, J</strong> — Royal Family Members</li>
+            <li><strong>3–10</strong> — Soldiers (for persuasion, defense, attack)</li>
+            <li><strong>2</strong> — Assassin</li>
+            <li><strong>Joker</strong> — Toggles the Age</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h3>⚔️ Game Flow</h3>
+          <p>Each round has a <strong>Flop</strong> (3 cards dealt) followed by <strong>3 turns</strong>.</p>
+          <p>Turn order is determined by card colors in the field:</p>
+          <ul>
+            <li><strong>Age of Uprising</strong> (no Joker): Lower color count goes first</li>
+            <li><strong>Age of Oppression</strong> (Joker present): Higher color count goes first</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h3>🎴 Turn Actions</h3>
+          <ol>
+            <li><strong>Draw</strong> — Take one card from field or deck</li>
+            <li><strong>Act</strong> — Use the card or field it</li>
+          </ol>
+        </div>
+
+        <div class="rules-section">
+          <h3>📜 Card Actions</h3>
+          <ul>
+            <li><strong>Field</strong> — Discard to field (always available)</li>
+            <li><strong>Persuade</strong> — Activate alliance castle (20 points needed)</li>
+            <li><strong>Threaten</strong> — Cancel opponent's persuasion</li>
+            <li><strong>Fortify</strong> — Defend castle with soldiers</li>
+            <li><strong>Battle</strong> — Attack fortifications</li>
+            <li><strong>Raid</strong> — Deal damage to undefended castle (20 to destroy)</li>
+            <li><strong>Bring to Power</strong> — Place royal in matching castle</li>
+            <li><strong>Assassinate</strong> — Kill enemy royal (2 from field)</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h3>⚠️ Assassin Warning</h3>
+          <p>Drawing a 2 from the <strong>deck</strong> kills one of YOUR royals!</p>
+          <p>Drawing a 2 from the <strong>field</strong> lets you assassinate an enemy royal.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+      <!-- Top Player Area (Player 2 - Red/Scarlett) -->
+      <div class="player-area top" id="player2-area">
+        <div class="player-header">
+          <span class="player-name">The Scarlett</span>
+          <span class="player-indicator" id="player2-indicator"></span>
+        </div>
+        <div class="castles-row">
+          <div class="castle-container" id="p2-primary-castle">
+            <div class="castle-label">Heart Castle</div>
+            <div class="castle-slot">
+              <div class="fortification-slot" id="p2-primary-fort"></div>
+              <div class="castle-card" id="p2-primary-ace"></div>
+              <div class="royal-stack" id="p2-primary-royals"></div>
+              <div class="dungeon-slot" id="p2-primary-dungeon"></div>
+            </div>
+            <div class="damage-track" id="p2-primary-damage"></div>
+            <div class="health-bar-container" id="p2-primary-health">
+              <div class="health-bar-label">HP</div>
+              <div class="health-bar"><div class="health-bar-fill"></div></div>
+              <div class="health-bar-text">20/20</div>
+            </div>
+            <div class="castle-stats" id="p2-primary-stats"></div>
+          </div>
+          <div class="castle-container alliance" id="p2-alliance-castle">
+            <div class="castle-label">Diamond Castle <span class="alliance-tag">(Alliance)</span></div>
+            <div class="castle-slot">
+              <div class="fortification-slot" id="p2-alliance-fort"></div>
+              <div class="castle-card" id="p2-alliance-ace"></div>
+              <div class="royal-stack" id="p2-alliance-royals"></div>
+              <div class="dungeon-slot" id="p2-alliance-dungeon"></div>
+            </div>
+            <div class="persuasion-track" id="p2-alliance-persuasion"></div>
+            <div class="persuasion-bar-container" id="p2-alliance-persuasion-bar">
+              <div class="persuasion-bar-label">⚔️</div>
+              <div class="persuasion-bar"><div class="persuasion-bar-fill"></div></div>
+              <div class="persuasion-bar-text">0/20</div>
+            </div>
+            <div class="damage-track" id="p2-alliance-damage"></div>
+            <div class="health-bar-container" id="p2-alliance-health">
+              <div class="health-bar-label">HP</div>
+              <div class="health-bar"><div class="health-bar-fill"></div></div>
+              <div class="health-bar-text">20/20</div>
+            </div>
+            <div class="castle-stats" id="p2-alliance-stats"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Area - Field & Deck -->
+      <div class="center-area">
+        <div class="game-info">
+          <div class="age-indicator" id="age-indicator">
+            <span class="age-icon">☀️</span>
+            <span class="age-text">Age of Uprising</span>
+          </div>
+          <div class="round-info">
+            <span id="round-number">Round 1</span>
+            <span id="turn-info">Turn 1/3</span>
+          </div>
+        </div>
+
+        <div class="field-area">
+          <div class="deck-container">
+            <div class="card deck-card" id="deck">
+              <div class="card-back">
+                <div class="card-back-pattern"></div>
+              </div>
+            </div>
+            <div class="deck-count" id="deck-count">48</div>
+          </div>
+
+          <div class="field-piles">
+            <div class="field-pile" id="field-pile-0">
+              <div class="pile-label">Field 1</div>
+              <div class="pile-cards"></div>
+            </div>
+            <div class="field-pile" id="field-pile-1">
+              <div class="pile-label">Field 2</div>
+              <div class="pile-cards"></div>
+            </div>
+            <div class="field-pile" id="field-pile-2">
+              <div class="pile-label">Field 3</div>
+              <div class="pile-cards"></div>
+            </div>
+          </div>
+
+          <div class="joker-area" id="joker-area">
+            <div class="joker-label">Joker</div>
+            <div class="joker-slot" id="joker-slot"></div>
+          </div>
+        </div>
+
+        <div class="action-area" id="action-area">
+          <div class="drawn-card-display" id="drawn-card-display">
+            <div class="drawn-label">Drawn Card</div>
+            <div class="drawn-card-slot" id="drawn-card-slot"></div>
+          </div>
+          <div class="actions-panel" id="actions-panel">
+            <div class="actions-title">Choose Action</div>
+            <div class="actions-list" id="actions-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Player Area (Player 1 - Black/Starless) -->
+      <div class="player-area bottom" id="player1-area">
+        <div class="castles-row">
+          <div class="castle-container" id="p1-primary-castle">
+            <div class="castle-label">Spade Castle</div>
+            <div class="castle-slot">
+              <div class="fortification-slot" id="p1-primary-fort"></div>
+              <div class="castle-card" id="p1-primary-ace"></div>
+              <div class="royal-stack" id="p1-primary-royals"></div>
+              <div class="dungeon-slot" id="p1-primary-dungeon"></div>
+            </div>
+            <div class="damage-track" id="p1-primary-damage"></div>
+            <div class="health-bar-container" id="p1-primary-health">
+              <div class="health-bar-label">HP</div>
+              <div class="health-bar"><div class="health-bar-fill"></div></div>
+              <div class="health-bar-text">20/20</div>
+            </div>
+            <div class="castle-stats" id="p1-primary-stats"></div>
+          </div>
+          <div class="castle-container alliance" id="p1-alliance-castle">
+            <div class="castle-label">Club Castle <span class="alliance-tag">(Alliance)</span></div>
+            <div class="castle-slot">
+              <div class="fortification-slot" id="p1-alliance-fort"></div>
+              <div class="castle-card" id="p1-alliance-ace"></div>
+              <div class="royal-stack" id="p1-alliance-royals"></div>
+              <div class="dungeon-slot" id="p1-alliance-dungeon"></div>
+            </div>
+            <div class="persuasion-track" id="p1-alliance-persuasion"></div>
+            <div class="persuasion-bar-container" id="p1-alliance-persuasion-bar">
+              <div class="persuasion-bar-label">⚔️</div>
+              <div class="persuasion-bar"><div class="persuasion-bar-fill"></div></div>
+              <div class="persuasion-bar-text">0/20</div>
+            </div>
+            <div class="damage-track" id="p1-alliance-damage"></div>
+            <div class="health-bar-container" id="p1-alliance-health">
+              <div class="health-bar-label">HP</div>
+              <div class="health-bar"><div class="health-bar-fill"></div></div>
+              <div class="health-bar-text">20/20</div>
+            </div>
+            <div class="castle-stats" id="p1-alliance-stats"></div>
+          </div>
+        </div>
+        <div class="player-header">
+          <span class="player-name">The Starless</span>
+          <span class="player-indicator" id="player1-indicator"></span>
+        </div>
+      </div>
+
+      <!-- Message Log -->
+      <div class="message-log" id="message-log">
+        <div class="log-header">Battle Chronicle</div>
+        <div class="log-content" id="log-content"></div>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div class="game-over-overlay" id="game-over-overlay">
+        <div class="game-over-content">
+          <h2 id="winner-text">Victory!</h2>
+          <p id="winner-name"></p>
+          <button id="play-again-btn" class="royal-btn">Fight Again</button>
+          <button id="return-title-btn" class="royal-btn secondary">Return to Title</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js?v=8"></script>
+  <script src="ui.js?v=8"></script>
+  <script src="simulate.js?v=8"></script>
+</body>
+</html>

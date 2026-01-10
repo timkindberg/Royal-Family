@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Simulation results (large JSON files)
+simulation-results/
+
+# OS files
+.DS_Store
