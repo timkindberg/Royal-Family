@@ -1384,31 +1384,21 @@ class AIPlayer {
           score += denialValue * 0.5; // Add 50% of opponent's value as denial bonus
         }
         
-        // UNCOVER AWARENESS: Consider what's underneath this card
-        // Turn position matters! After turn 3/3, new flop covers everything.
-        // - Turn 1/3: Might grab it turn 3/3, but opponent might cover it turn 2/3
-        // - Turn 2/3 or 3/3: Flop will bury it, need to re-uncover next round
+        // AI FIX #9: Simplified uncover logic
+        // Simple rule: consider what's underneath, but don't overthink it
         if (pile.length > 1) {
           const cardUnderneath = pile[pile.length - 2];
           const uncoverValueForOpponent = this.evaluateCardForOpponent(cardUnderneath);
           const uncoverValueForMe = this.evaluateCard(cardUnderneath);
-          
-          const turnIndex = this.game.currentTurnIndex; // 0, 1, or 2
-          
-          // Penalize if we'd uncover something good for opponent
+
+          // Slight penalty if we'd uncover something valuable for opponent
           if (uncoverValueForOpponent >= 12) {
-            // Turn 1: They'll likely grab it immediately on turn 2
-            // Turns 2-3: Flop coming, less impactful
-            const penaltyMultiplier = turnIndex === 0 ? 0.5 : 0.2;
-            score -= uncoverValueForOpponent * 0.4 * penaltyMultiplier;
+            score -= 3; // Small flat penalty (was complex formula)
           }
-          
-          // Bonus if we'd uncover something good for us
+
+          // Slight bonus if we'd uncover something valuable for us
           if (uncoverValueForMe >= 15) {
-            // Turn 1/3: ~40% chance we get it (opponent might cover to deny, or be distracted)
-            // Turns 2-3/3: ~10% chance (flop coming, need perfect next round)
-            const multiplier = turnIndex === 0 ? 0.4 : 0.1;
-            score += uncoverValueForMe * multiplier;
+            score += 2; // Small flat bonus (was complex formula)
           }
         }
         
@@ -1720,19 +1710,19 @@ class AIPlayer {
         let bestCoverValue = 0;
         let hasAssassinOnField = false;
         let hasDesirableRoyalOnField = false;
-        
+
         for (let i = 0; i < 3; i++) {
           const pile = this.game.fieldPiles[i];
           if (pile.length > 0) {
             const topCard = pile[pile.length - 1];
             const coverVal = this.evaluateCardForOpponent(topCard);
             bestCoverValue = Math.max(bestCoverValue, coverVal);
-            
+
             // Track if there's an assassin we could cover
             if (topCard.value === '2') {
               hasAssassinOnField = true;
             }
-            
+
             // Track if there's a royal we'd want for ourselves
             if (topCard.isRoyal) {
               const ourCastle = this.player.getCastleBySuit(topCard.suit);
@@ -1742,15 +1732,15 @@ class AIPlayer {
             }
           }
         }
-        
+
         let score = 1 + bestCoverValue * 0.3;
-        
+
         // STRATEGIC PLAY: If there's both an assassin AND a royal we want on the field,
         // covering the assassin first is smart - makes it safe to grab the royal next turn!
         if (hasAssassinOnField && hasDesirableRoyalOnField) {
           score += 12; // Boost field action to set up the safe royal grab
         }
-        
+
         if (isLastTurn) score *= 0.1;
         return Math.min(score, 20); // Cap raised to allow strategic plays
       }
