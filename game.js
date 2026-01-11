@@ -1959,15 +1959,15 @@ class AIPlayer {
   // Decide which field pile to place card on
   async decideFieldPile() {
     await this.delay(this.thinkingDelay / 2);
-    
+
     // Check if it's the last turn of the round - covering is less valuable
     // because the next flop will cover everything anyway
     const isLastTurn = this.game.currentTurnIndex >= this.game.turnsPerRound;
-    
-    // Check for strategic situation: assassin + desirable royal both on field
-    let hasDesirableRoyal = false;
+
+    // Find assassin pile index
     let assassinPileIndex = -1;
-    
+    let hasDesirableRoyalOnField = false;
+
     for (let i = 0; i < 3; i++) {
       const pile = this.game.fieldPiles[i];
       if (pile.length > 0) {
@@ -1978,17 +1978,27 @@ class AIPlayer {
         if (topCard.isRoyal) {
           const ourCastle = this.player.getCastleBySuit(topCard.suit);
           if (ourCastle && ourCastle.isActive && !ourCastle.destroyed) {
-            hasDesirableRoyal = true;
+            hasDesirableRoyalOnField = true;
           }
         }
       }
     }
-    
-    // STRATEGIC: If there's a royal we want AND an assassin, cover the assassin!
-    if (hasDesirableRoyal && assassinPileIndex >= 0 && !isLastTurn) {
-      this.game.phase = 'action';
-      this.game.executeAction('field', assassinPileIndex);
-      return;
+
+    // AI FIX #11: Strategic assassin burial
+    // If we're fielding our own usable royal AND assassin is visible, cover the assassin!
+    // This lets us safely bring a royal to power on our next turn.
+    const drawnCard = this.game.drawnCard;
+    const isOurUsableRoyal = drawnCard && drawnCard.isRoyal &&
+      this.player.getCastleBySuit(drawnCard.suit)?.isActive &&
+      !this.player.getCastleBySuit(drawnCard.suit)?.destroyed;
+
+    if (assassinPileIndex >= 0 && !isLastTurn) {
+      // Cover assassin if: we're fielding our own royal OR there's a royal we want on field
+      if (isOurUsableRoyal || hasDesirableRoyalOnField) {
+        this.game.phase = 'action';
+        this.game.executeAction('field', assassinPileIndex);
+        return;
+      }
     }
     
     // Evaluate each pile for "cover value" - how much we hurt opponent by covering it
