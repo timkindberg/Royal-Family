@@ -1113,7 +1113,8 @@ class AIPlayer {
     this.lastAction = null;
     
     // Personality variance (how much randomness in decisions)
-    this.variance = 3; // ±3 points random variance
+    // AI FIX #5: Reduced variance for more consistent decisions
+    this.variance = 1; // ±1 points random variance (was 3)
     this.similarThreshold = 5; // Actions within 5 points are "similar"
   }
 
@@ -1269,9 +1270,9 @@ class AIPlayer {
       case AIPlayer.MOODS.DEFENSIVE:
         if (['fortify', 'repair-fortification', 'upgrade-fortification'].includes(actionType)) {
           modifier = 6;
-        } else if (['raid', 'battle'].includes(actionType)) {
-          modifier = -4;
         }
+        // AI FIX #3: Removed raid/battle penalty
+        // Being defensive doesn't mean refusing to attack when it's smart!
         break;
         
       case AIPlayer.MOODS.AMBITIOUS:
@@ -1633,6 +1634,39 @@ class AIPlayer {
     return count;
   }
 
+  // AI FIX #1: Filter out objectively bad choices before scoring
+  filterSuboptimalActions(actions) {
+    // Check if we have raid available (real raid, not raid-no-damage)
+    const hasRaid = actions.some(a => a.type === 'raid');
+
+    if (hasRaid) {
+      // If we can raid (deal permanent damage), remove ALL battle actions
+      // Raiding unfortified castle is ALWAYS better than battling fortified one
+      // NOTE: We don't filter battles when only raid-no-damage is available,
+      // because raid-no-damage doesn't deal permanent damage either
+      return actions.filter(a => a.type !== 'battle');
+    }
+
+    // Check if we have justified fortify (castle has royals but no fortification)
+    const hasJustifiedFortify = actions.some(a => {
+      if (a.type !== 'fortify' && a.type !== 'upgrade-fortification') return false;
+      const castle = a.castle;
+      return castle && castle.royalFamily.length > 0 && !castle.fortification;
+    });
+
+    if (hasJustifiedFortify) {
+      // If we have royals needing protection, remove redundant fortify options
+      return actions.filter(a => {
+        if (a.type !== 'fortify' && a.type !== 'upgrade-fortification') return true;
+        const castle = a.castle;
+        // Keep only fortifies for castles with royals but no fortification
+        return castle && castle.royalFamily.length > 0 && !castle.fortification;
+      });
+    }
+
+    return actions;
+  }
+
   // Decide which action to take
   async decideAction() {
     await this.delay(this.thinkingDelay / 2);
@@ -1642,8 +1676,11 @@ class AIPlayer {
 
     if (enabledActions.length === 0) return;
 
+    // AI FIX #1: Filter out objectively bad choices before scoring
+    const filteredActions = this.filterSuboptimalActions(enabledActions);
+
     // Score each action with mood modifiers and variance
-    const scoredActions = enabledActions.map(action => {
+    const scoredActions = filteredActions.map(action => {
       let score = this.scoreAction(action);
       score = this.applyMoodModifier(action.type, score); // Apply mood
       score = this.addVariance(score); // Add randomness
@@ -1796,7 +1833,12 @@ class AIPlayer {
       case 'fortify': {
         const castle = action.castle;
         const hasRoyals = castle && castle.royalFamily.length > 0;
-        
+
+        // AI FIX #2: Don't fortify if already protected and not under attack
+        if (castle.fortification && castle.fortificationDamage.length === 0) {
+          return -5; // Already protected, don't waste the card
+        }
+
         if (hasRoyals) {
           // URGENT: Protect our royals!
           return 25 + (card.numericValue * 0.3);
@@ -1808,7 +1850,12 @@ class AIPlayer {
       case 'upgrade-fortification': {
         const castle = action.castle;
         const hasRoyals = castle && castle.royalFamily.length > 0;
-        
+
+        // AI FIX #2: Only upgrade if under active threat
+        if (castle.fortificationDamage.length === 0) {
+          return 5; // Not under attack, low priority
+        }
+
         if (hasRoyals) {
           return 18 + (card.numericValue * 0.2);
         }
@@ -1849,20 +1896,22 @@ class AIPlayer {
         const attackingCastle = action.attackingCastle;
         const enemyHasRoyals = targetCastle?.royalFamily.length > 0;
         const ourRoyals = attackingCastle?.royalFamily.length || 0;
-        
-        // Base high priority - we can deal permanent damage
-        let score = 30;
-        
+
+        // AI FIX #6: Boost raid scoring - permanent damage is THE most important action!
+        // Old: 30-38, but persuade scored 40, so AI preferred building over attacking
+        // New: 45+ to make raids top priority
+        let score = 45;
+
         // Even better if we can capture/kill their royals
         if (enemyHasRoyals) {
-          score += 8;
+          score += 10;
         }
-        
-        // Slightly less valuable if we might lose our royal in the raid
+
+        // Don't penalize single royal raids as much - damage is damage
         if (ourRoyals === 1) {
-          score -= 5; // Risk of losing our only royal
+          score -= 2; // Small risk adjustment (was -5)
         }
-        
+
         return score;
       }
 
@@ -1995,26 +2044,23 @@ class AIPlayer {
     const options = this.game.getRaidOptions();
     if (options.length === 0) return;
 
-    // Priority: kill > kidnap > rescue > skip
-    // (Killing is better than kidnapping since killed royals are permanently gone)
-    const killOption = options.find(o => o.type === 'kill');
-    const kidnapOption = options.find(o => o.type === 'kidnap');
+    const killOptions = options.filter(o => o.type === 'kill');
+    const kidnapOptions = options.filter(o => o.type === 'kidnap');
     const rescueOption = options.find(o => o.type === 'rescue');
 
-    if (killOption) {
-      // Kill the highest rank royal
-      const killOptions = options.filter(o => o.type === 'kill');
-      const best = killOptions.reduce((a, b) => 
-        ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
-      );
-      this.game.executeRaidChoice('kill', best.target);
-    } else if (rescueOption) {
-      // Rescue our imprisoned royal!
+    // Always rescue first
+    if (rescueOption) {
       this.game.executeRaidChoice('rescue');
-    } else if (kidnapOption) {
-      // Kidnap the highest rank royal (less preferred than kill)
-      const kidnapOptions = options.filter(o => o.type === 'kidnap');
-      const best = kidnapOptions.reduce((a, b) => 
+      return;
+    }
+
+    if (killOptions.length > 0) {
+      // AI FIX #4: Strategic kill selection
+      const best = this.chooseBestKillTarget(killOptions);
+      this.game.executeRaidChoice('kill', best.target);
+    } else if (kidnapOptions.length > 0) {
+      // Kidnap highest rank (less preferred than kill)
+      const best = kidnapOptions.reduce((a, b) =>
         ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
       );
       this.game.executeRaidChoice('kidnap', best.target);
@@ -2022,6 +2068,23 @@ class AIPlayer {
       // Skip if no beneficial action
       this.game.executeRaidChoice('skip');
     }
+  }
+
+  // AI FIX #4: Choose kill target strategically
+  chooseBestKillTarget(killOptions) {
+    const raidedCastle = this.game.raidTarget;
+
+    // Strategy: Prefer killing the ONLY royal in a castle over killing highest rank
+    // Eliminating a castle's attack capability is better than reducing strength
+    if (raidedCastle.royalFamily.length === 1) {
+      // This is the only royal - killing it eliminates castle's raid capability!
+      return killOptions[0];
+    }
+
+    // Otherwise, kill highest rank (existing behavior)
+    return killOptions.reduce((a, b) =>
+      ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
+    );
   }
 
   // Decide which royal to sacrifice to assassin
