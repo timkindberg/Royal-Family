@@ -1780,13 +1780,14 @@ class AIPlayer {
         // HEAVY PENALTY for placing in unfortified castle when assassin is visible
         // (Opponent could grab the assassin and kill the royal immediately!)
         else {
-          const fieldHasAssassin = this.game.fieldPiles.some(pile => 
+          const fieldHasAssassin = this.game.fieldPiles.some(pile =>
             pile.length > 0 && pile[pile.length - 1].value === '2'
           );
           if (fieldHasAssassin) {
-            // Reduce score dramatically - should fortify first if possible!
-            // First royal: 22 - 18 = 4, Second: 12 - 18 = -6, Third: 6 - 18 = -12
-            score -= 18;
+            // AI FIX #7: Make penalty severe enough to NEVER place unprotected royals
+            // Combined with Fix #7 (fortify scores 60 when assassin visible),
+            // AI will ALWAYS fortify first instead of placing royal
+            score -= 30; // Was -18, now ensures negative score even for first royal
           }
         }
         
@@ -1837,6 +1838,16 @@ class AIPlayer {
         // AI FIX #2: Don't fortify if already protected and not under attack
         if (castle.fortification && castle.fortificationDamage.length === 0) {
           return -5; // Already protected, don't waste the card
+        }
+
+        // AI FIX #7: URGENT fortify when assassin visible and royals unprotected
+        const fieldHasAssassin = this.game.fieldPiles.some(pile =>
+          pile.length > 0 && pile[pile.length - 1].value === '2'
+        );
+
+        if (hasRoyals && !castle.fortification && fieldHasAssassin) {
+          // CRITICAL: Assassin on field + unprotected royals = TOP PRIORITY!
+          return 60; // Higher than raid (45) - protect first, then attack
         }
 
         if (hasRoyals) {
