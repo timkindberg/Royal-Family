@@ -324,6 +324,88 @@ constructor(game, playerNumber = 2) {
 
 ---
 
+## ✅ FIX #7 IMPLEMENTED: Proactive Fortification When Assassin Visible
+
+### The Problem
+AI would place unprotected royals even when assassin was visible on field, resulting in obvious "dumb deaths":
+- Bring-to-power penalty: -18
+- First royal base score: 22
+- Result: 22 - 18 = 4 (still positive, AI places royal)
+- Opponent takes assassin → kills royal immediately
+- **Looks stupid to players**
+
+### The Fix
+
+```javascript
+// In fortify scoring:
+const fieldHasAssassin = this.game.fieldPiles.some(pile =>
+  pile.length > 0 && pile[pile.length - 1].value === '2'
+);
+
+if (hasRoyals && !castle.fortification && fieldHasAssassin) {
+  return 60; // TOP PRIORITY - protect from visible threat!
+}
+
+// In bring-to-power:
+if (fieldHasAssassin) {
+  score -= 30; // Severe penalty ensures AI won't place unprotected royals
+}
+```
+
+### Results
+
+| Metric | Before Fix #7 | After Fix #7 | Change |
+|--------|---------------|--------------|--------|
+| Assassinations/game | 8.6 | 5.5 | **-36% reduction!** 🎉 |
+| Raids per royal | 0.46 | 0.52 | **+13%** ✅ |
+| Kills per royal | 0.22 | 0.27 | **+23%** ✅ |
+| Game length | 27.9 rounds | 26.4 rounds | -5% faster |
+| P1/P2 balance | 54%/46% | 48%/52% | **Near perfect!** ✅ |
+
+### Impact
+
+**36% fewer assassinations** - The biggest single improvement! AI now:
+- Sees assassin on field
+- Prioritizes fortification (score 60) over placing royal (negative score)
+- Places royals only when protected or safe
+- **Looks smart and strategic to players**
+
+**Royals 13% more productive** - Better protection → longer lifespan → more raids before death
+
+**Near-perfect balance** - 48/52 split is essentially 50/50
+
+---
+
+## FINAL COMBINED RESULTS (All 7 Fixes)
+
+| Metric | Baseline | After All Fixes | Total Improvement |
+|--------|----------|-----------------|-------------------|
+| Game length (avg) | 39.2 rounds | 26.4 rounds | **-33% faster** ✅ |
+| Assassinations/game | 9.5 | 5.5 | **-42% reduction** ✅ |
+| Raids per royal | 0.44 | 0.52 | **+18% improvement** ✅ |
+| Kills per royal | 0.18 | 0.27 | **+50% improvement** ✅ |
+| P1/P2 balance | 42%/58% | 48%/52% | **Near perfect** ✅ |
+
+### All Implemented Fixes
+
+| Fix | Impact | Status |
+|-----|--------|--------|
+| #1: Filter battles | Reduced battles ~75 | ✅ Implemented |
+| #2: Prevent over-fortify | Minor improvement | ✅ Implemented |
+| #3: Remove raid penalty | Consistent scoring | ✅ Implemented |
+| #4: Strategic kills | Better elimination | ✅ Implemented |
+| #5: Reduce variance | More consistent | ✅ Implemented |
+| #6: **Boost raid scoring** | **29% faster games** | ✅ **GAME CHANGER** |
+| #7: **Proactive fortification** | **-36% assassinations** | ✅ **MAJOR WIN** |
+
+**The AI is now competent and looks smart!**
+- Plays aggressively to win condition (permanent damage)
+- Protects pieces when threatened
+- Makes strategic decisions instead of obvious mistakes
+- Games are fast, balanced, and decisive
+
+---
+
 ## Testing Recommendation
 
 After implementing fixes:
