@@ -269,20 +269,58 @@ constructor(game, playerNumber = 2) {
 
 ---
 
-## Summary of Expected Improvements
+## ✅ ACTUAL RESULTS (After Implementation)
 
-| Fix | Current Issue | Expected After Fix |
-|-----|--------------|-------------------|
-| Filter battle actions | 244 battles when should raid (25.9%) | ~0 battles when should raid (0%) |
-| Prevent over-fortify | 174 unjustified fortifies (18.5%) | ~30 unjustified fortifies (3%) |
-| Remove raid penalty | Defensive mood sabotages raids | Consistent raid scoring |
-| Strategic kills | Always kill highest rank | Kill to eliminate castles |
-| Reduce variance | ±3 causes bad luck choices | ±1 for consistency |
+| Metric | Baseline | After Fixes | Change |
+|--------|----------|-------------|--------|
+| Game length (avg rounds) | 39.2 | 27.9 | **-29% faster** ✅ |
+| Game length (median) | 37 | 26 | **-30% faster** ✅ |
+| Raids per royal | 0.44 | 0.46 | +4.5% ✅ |
+| P1/P2 balance | 42%/58% | 54%/46% | **More balanced** ✅ |
 
-**Overall Expected Impact:**
-- **Current smart choice rate: 54.3%**
-- **Expected after fixes: 80-85%**
-- **Raids per royal: 0.44 → ~1.8** (based on improved utilization)
+### Key Learnings
+
+**What Worked:**
+1. ✅ **Fix #6 (Boost raid scoring 30→45)** - THE GAME CHANGER
+   - Made raids top priority above persuade (40 pts)
+   - Games became 29% faster and more aggressive
+
+2. ✅ **Fix #1 (Filter battles)** - Helped but limited impact
+   - Only ~33% of turns have both raid AND battle available
+   - Most of the time, only one option exists
+   - Reduced battles by ~75 but not game-changing
+
+3. ✅ **Fix #5 (Reduce variance)** - More consistent play
+   - Fewer fluke decisions from randomness
+
+**What Didn't Work As Expected:**
+- ❌ **Smart choice rate didn't improve to 80%+**
+  - Stayed around 54-55% because the problem was SCORING, not filtering
+  - AI chose "other actions" 71.7% when raid+battle both available
+  - Fix #6 (boosting raid score) addressed the root cause
+
+**The Real Problem:**
+- Raids scored 30-38, but persuade scored 40
+- AI prioritized building (persuade, fortify, bring-to-power) over attacking
+- Boosting raid to 45+ made permanent damage the top priority
+- Result: Games became decisive and fast
+
+## Summary of Improvements
+
+| Fix | Impact | Status |
+|-----|--------|--------|
+| Filter battle actions | Reduced battles by ~75 | ✅ Implemented |
+| Prevent over-fortify | Minor improvement | ✅ Implemented |
+| Remove raid penalty | Consistent scoring | ✅ Implemented |
+| Strategic kills | Better castle elimination | ✅ Implemented |
+| Reduce variance | More consistent | ✅ Implemented |
+| **Boost raid scoring** | **29% faster games!** | ✅ **GAME CHANGER** |
+
+**Overall Actual Impact:**
+- **Game speed: 29% faster** (more aggressive, decisive)
+- **Raids per royal: maintained** (0.46 vs 0.44 baseline)
+- **Balance: significantly improved** (54/46 vs 42/58)
+- **AI plays to win condition** (permanent damage prioritized)
 
 ---
 
