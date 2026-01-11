@@ -1376,32 +1376,22 @@ class AIPlayer {
       if (pile.length > 0) {
         const card = pile[pile.length - 1];
         let score = this.evaluateCard(card);
-        
-        // DENIAL BONUS: Add value for denying opponent a useful card
-        const denialValue = this.evaluateCardForOpponent(card);
-        if (denialValue >= 15) {
-          // This card would be GREAT for opponent - take it to deny them!
-          score += denialValue * 0.5; // Add 50% of opponent's value as denial bonus
-        }
-        
-        // AI FIX #9: Simplified uncover logic
-        // Simple rule: consider what's underneath, but don't overthink it
+
+        // AI FIX #10: Improved uncover logic
+        // Evaluate what's underneath using full card evaluation, not flat bonuses
+        // Uncovering their Queen is much worse than uncovering their 4
         if (pile.length > 1) {
           const cardUnderneath = pile[pile.length - 2];
           const uncoverValueForOpponent = this.evaluateCardForOpponent(cardUnderneath);
           const uncoverValueForMe = this.evaluateCard(cardUnderneath);
 
-          // Slight penalty if we'd uncover something valuable for opponent
-          if (uncoverValueForOpponent >= 12) {
-            score -= 3; // Small flat penalty (was complex formula)
-          }
+          // Penalty for uncovering opponent's valuable cards (scales with card value)
+          score -= uncoverValueForOpponent * 0.3;
 
-          // Slight bonus if we'd uncover something valuable for us
-          if (uncoverValueForMe >= 15) {
-            score += 2; // Small flat bonus (was complex formula)
-          }
+          // Bonus for uncovering our valuable cards (scales with card value)
+          score += uncoverValueForMe * 0.2;
         }
-        
+
         score = this.addVariance(score); // Add randomness
         fieldOptions.push({ index: i, card, score });
       }
@@ -2022,16 +2012,10 @@ class AIPlayer {
       pileOptions.push({ index: i, coverValue, size: pile.length });
     }
     
-    // Sort by cover value (highest = best pile to cover)
-    pileOptions.sort((a, b) => {
-      // Primary: cover value
-      if (b.coverValue !== a.coverValue) {
-        return b.coverValue - a.coverValue;
-      }
-      // Tiebreaker: prefer piles with more cards (bury our card deeper)
-      return b.size - a.size;
-    });
-    
+    // AI FIX #10: Sort by cover value only (pile depth doesn't matter)
+    // Pick pile with highest cover value = bury opponent's best card
+    pileOptions.sort((a, b) => b.coverValue - a.coverValue);
+
     const targetPile = pileOptions[0].index;
     
     this.game.phase = 'action';
