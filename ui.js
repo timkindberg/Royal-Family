@@ -96,6 +96,7 @@ class GameUI {
     if (vsAI) {
       // AI controls player 2 (The Scarlett - Red)
       this.ai = new AIPlayer(this.game, 2);
+      this.ai.ui = this; // Give AI reference to UI for animations
       this.game.player2.name = 'The Crown'; // AI name
     } else {
       this.ai = null;
@@ -722,15 +723,42 @@ class GameUI {
     setTimeout(() => this.animateCardDrawFromDeck(), 50);
   }
 
-  handleFieldClick(pileIndex) {
+  async handleFieldClick(pileIndex) {
     if (this.game.phase !== 'draw') return;
     if (this.game.fieldPiles[pileIndex].length === 0) return;
 
-    this.game.drawFromField(pileIndex);
-    this.render();
+    // Get the source card before moving it
+    const fieldPile = this.fieldPiles[pileIndex];
+    const sourceCard = fieldPile?.querySelector('.card:last-child');
 
-    // Animate card draw from field
-    setTimeout(() => this.animateCardDrawFromField(pileIndex), 50);
+    if (sourceCard && document.startViewTransition) {
+      // Mark source for transition
+      sourceCard.style.viewTransitionName = 'card-moving';
+
+      // Use view transition
+      const transition = document.startViewTransition(() => {
+        this.game.drawFromField(pileIndex);
+        this.render();
+
+        // Mark destination
+        const drawnCard = this.drawnCardSlot.querySelector('.card');
+        if (drawnCard) {
+          drawnCard.style.viewTransitionName = 'card-moving';
+        }
+      });
+
+      await transition.finished;
+
+      // Clean up
+      if (sourceCard) sourceCard.style.viewTransitionName = '';
+      const drawnCard = this.drawnCardSlot.querySelector('.card');
+      if (drawnCard) drawnCard.style.viewTransitionName = '';
+    } else {
+      // No view transitions support
+      this.game.drawFromField(pileIndex);
+      this.render();
+      setTimeout(() => this.animateCardDrawFromDeck(), 50);
+    }
   }
 
   async handleAction(action) {
@@ -938,13 +966,33 @@ class GameUI {
     }
   }
 
-  // Animate card draw from field
+  // Animate card draw from field using View Transition
   animateCardDrawFromField(pileIndex) {
     const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (drawnCard) {
-      drawnCard.classList.add('card-slide-from-field');
+    const fieldPile = this.fieldPiles[pileIndex];
+    const topCard = fieldPile?.querySelector('.card:last-child');
+
+    if (drawnCard && topCard && document.startViewTransition) {
+      // Mark both source and destination
+      topCard.style.viewTransitionName = 'card-moving';
+      drawnCard.style.viewTransitionName = 'card-moving';
+
+      // Trigger view transition
+      const transition = document.startViewTransition(() => {
+        // The card is already moved, just update the DOM
+        // View transition will animate between the positions
+      });
+
+      transition.finished.then(() => {
+        // Clean up
+        if (topCard) topCard.style.viewTransitionName = '';
+        if (drawnCard) drawnCard.style.viewTransitionName = '';
+      });
+    } else if (drawnCard) {
+      // Fallback: use CSS animation
+      drawnCard.classList.add('card-slide-from-deck');
       setTimeout(() => {
-        drawnCard.classList.remove('card-slide-from-field');
+        drawnCard.classList.remove('card-slide-from-deck');
       }, 500);
     }
   }
@@ -1007,6 +1055,86 @@ class GameUI {
     setTimeout(() => {
       element.classList.remove('number-pop');
     }, 400);
+  }
+
+  // === AI Animation Wrappers ===
+  // These methods allow the AI to trigger animations while executing game logic
+
+  async aiDrawFromDeck() {
+    this.game.drawFromDeck();
+    this.render();
+    setTimeout(() => this.animateCardDrawFromDeck(), 50);
+  }
+
+  async aiDrawFromField(pileIndex) {
+    // Get the source card before moving it
+    const fieldPile = this.fieldPiles[pileIndex];
+    const sourceCard = fieldPile?.querySelector('.card:last-child');
+
+    if (sourceCard && document.startViewTransition) {
+      sourceCard.style.viewTransitionName = 'card-moving';
+
+      const transition = document.startViewTransition(() => {
+        this.game.drawFromField(pileIndex);
+        this.render();
+
+        const drawnCard = this.drawnCardSlot.querySelector('.card');
+        if (drawnCard) {
+          drawnCard.style.viewTransitionName = 'card-moving';
+        }
+      });
+
+      await transition.finished;
+
+      if (sourceCard) sourceCard.style.viewTransitionName = '';
+      const drawnCard = this.drawnCardSlot.querySelector('.card');
+      if (drawnCard) drawnCard.style.viewTransitionName = '';
+    } else {
+      this.game.drawFromField(pileIndex);
+      this.render();
+    }
+  }
+
+  async aiExecuteAction(actionType, target = null, additionalTarget = null) {
+    // Handle field action with pile index
+    if (actionType === 'field' && typeof target === 'number') {
+      await this.animateCardToFieldPile(target, () => {
+        this.game.executeAction('field', target);
+      });
+      return;
+    }
+
+    // Handle assassinate with target object
+    if (actionType === 'assassinate' && target && target.royal) {
+      // Find the target royal element
+      const targetPlayer = this.game.getPlayer(target.owner);
+      const castlePrefix = this.getCastlePrefix(targetPlayer, target.castle);
+      const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
+
+      let targetRoyalElement = null;
+      const royalCards = royalsSlot?.querySelectorAll('.card');
+      if (royalCards) {
+        for (const card of royalCards) {
+          const valueText = card.querySelector('.card-value')?.textContent;
+          const suitText = card.querySelector('.card-suit')?.textContent;
+          if (valueText === target.royal.value && suitText === target.royal.suit) {
+            targetRoyalElement = card;
+            break;
+          }
+        }
+      }
+
+      await this.animateAssassinToTarget(targetRoyalElement, () => {
+        this.game.executeAction('assassinate', target);
+      });
+      return;
+    }
+
+    // For other actions, create action object
+    const action = { type: actionType, castle: target, attackingCastle: additionalTarget };
+
+    // Use the same handleAction logic
+    await this.handleAction(action);
   }
 
   // Animate using View Transitions API

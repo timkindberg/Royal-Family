@@ -1147,6 +1147,7 @@ class AIPlayer {
     this.game = game;
     this.playerNumber = playerNumber;
     this.thinkingDelay = 800;
+    this.ui = null; // Will be set by UI if animations are needed
     
     // Mood system
     this.mood = this.randomMood();
@@ -1461,9 +1462,17 @@ class AIPlayer {
     const chosen = this.pickFromSimilarOptions(decentOptions);
     
     if (chosen.type === 'deck') {
-      this.game.drawFromDeck();
+      if (this.ui) {
+        await this.ui.aiDrawFromDeck();
+      } else {
+        this.game.drawFromDeck();
+      }
     } else {
-      this.game.drawFromField(chosen.index);
+      if (this.ui) {
+        await this.ui.aiDrawFromField(chosen.index);
+      } else {
+        this.game.drawFromField(chosen.index);
+      }
     }
   }
 
@@ -1961,7 +1970,24 @@ class AIPlayer {
     }
   }
 
-  executeAction(action) {
+  async executeAction(action) {
+    // Use UI animation wrappers if available
+    if (this.ui) {
+      // For assassinate, we need to set up the target
+      if (action.type === 'assassinate' && action.targets && action.targets.length > 0) {
+        const target = action.targets.reduce((best, t) =>
+          ROYAL_HIERARCHY[t.royal.value] > ROYAL_HIERARCHY[best.royal.value] ? t : best
+        );
+        await this.ui.aiExecuteAction('assassinate', target);
+        return;
+      }
+
+      // For other actions, pass them through
+      await this.ui.aiExecuteAction(action.type, action.castle, action.attackingCastle);
+      return;
+    }
+
+    // Fallback: no UI animations
     switch (action.type) {
       case 'field':
         // Will trigger field-select phase
@@ -1970,7 +1996,7 @@ class AIPlayer {
       case 'assassinate':
         // Pick the highest value royal to kill
         if (action.targets && action.targets.length > 0) {
-          const target = action.targets.reduce((best, t) => 
+          const target = action.targets.reduce((best, t) =>
             ROYAL_HIERARCHY[t.royal.value] > ROYAL_HIERARCHY[best.royal.value] ? t : best
           );
           this.game.executeAction('assassinate', target);
@@ -2038,7 +2064,11 @@ class AIPlayer {
       // Cover assassin if: we're fielding our own royal OR there's a royal we want on field
       if (isOurUsableRoyal || hasDesirableRoyalOnField) {
         this.game.phase = 'action';
-        this.game.executeAction('field', assassinPileIndex);
+        if (this.ui) {
+          await this.ui.aiExecuteAction('field', assassinPileIndex);
+        } else {
+          this.game.executeAction('field', assassinPileIndex);
+        }
         return;
       }
     }
@@ -2069,9 +2099,13 @@ class AIPlayer {
     pileOptions.sort((a, b) => b.coverValue - a.coverValue);
 
     const targetPile = pileOptions[0].index;
-    
+
     this.game.phase = 'action';
-    this.game.executeAction('field', targetPile);
+    if (this.ui) {
+      await this.ui.aiExecuteAction('field', targetPile);
+    } else {
+      this.game.executeAction('field', targetPile);
+    }
   }
 
   // Decide raid choice (damage is already applied when raid starts)
