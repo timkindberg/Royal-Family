@@ -560,8 +560,8 @@ class GameState {
     this.discardPile = [];
     this.fieldPiles = [[], [], []];
     
-    // Filter out jokers and shuffle
-    this.deck = cards.filter(c => !c.isJoker);
+    // Filter out jokers and castles (Aces) and shuffle
+    this.deck = cards.filter(c => !c.isJoker && !c.isCastle);
     shuffle(this.deck);
     
     this.log('Deck reshuffled!');
