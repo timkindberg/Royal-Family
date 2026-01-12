@@ -6,6 +6,8 @@ class GameUI {
     this.ai = null;
     this.vsAI = false;
     this.aiTurnInProgress = false;
+    this.lastPhase = null; // Track phase changes
+    this.animationQueue = []; // Queue for sequential animations
     this.bindElements();
     this.bindEvents();
     this.showScreen('title-screen');
@@ -92,7 +94,8 @@ class GameUI {
     this.game.reset();
     this.vsAI = vsAI;
     this.aiTurnInProgress = false;
-    
+    this.lastPhase = null; // Reset phase tracking
+
     if (vsAI) {
       // AI controls player 2 (The Scarlett - Red)
       this.ai = new AIPlayer(this.game, 2);
@@ -100,12 +103,12 @@ class GameUI {
     } else {
       this.ai = null;
     }
-    
+
     this.gameOverOverlay.classList.remove('active');
     this.showScreen('game-screen');
     this.game.startGame();
     this.render();
-    
+
     // Check if AI should take first turn
     this.checkAITurn();
   }
@@ -193,6 +196,12 @@ class GameUI {
 
   // Main render function
   render() {
+    // Detect phase changes and show banners
+    if (this.lastPhase !== this.game.phase) {
+      this.handlePhaseChange(this.lastPhase, this.game.phase);
+      this.lastPhase = this.game.phase;
+    }
+
     this.renderField();
     this.renderPlayers();
     this.renderGameInfo();
@@ -208,6 +217,32 @@ class GameUI {
 
     // Check if AI should take a turn
     this.checkAITurn();
+  }
+
+  // Handle phase transitions with banners
+  handlePhaseChange(oldPhase, newPhase) {
+    // Don't show banner on initial setup
+    if (!oldPhase) return;
+
+    switch (newPhase) {
+      case 'draw':
+        this.showPhaseBanner('DRAW PHASE', 'Choose a card from deck or field', '🎴');
+        break;
+      case 'action':
+        this.showPhaseBanner('ACTION PHASE', 'Execute your strategy', '⚔️');
+        break;
+      case 'flop':
+        if (this.game.roundNumber > 1) {
+          this.showPhaseBanner(`ROUND ${this.game.roundNumber}`, 'A new round begins', '🎯');
+        }
+        break;
+      case 'raid-choice':
+        this.showPhaseBanner('RAID SUCCESSFUL!', 'Choose your follow-up action', '💥');
+        break;
+      case 'assassin-surprise':
+        this.showPhaseBanner('ASSASSIN ATTACK!', 'Sacrifice a royal or lose the card', '🗡️');
+        break;
+    }
   }
 
   // Check if it's the AI's turn and trigger it
@@ -711,17 +746,23 @@ class GameUI {
   handleDeckClick() {
     if (this.game.phase !== 'draw') return;
     if (this.game.deck.length === 0) return;
-    
+
     this.game.drawFromDeck();
     this.render();
+
+    // Animate card draw with flip
+    setTimeout(() => this.animateCardDrawFromDeck(), 50);
   }
 
   handleFieldClick(pileIndex) {
     if (this.game.phase !== 'draw') return;
     if (this.game.fieldPiles[pileIndex].length === 0) return;
-    
+
     this.game.drawFromField(pileIndex);
     this.render();
+
+    // Animate card draw from field
+    setTimeout(() => this.animateCardDrawFromField(pileIndex), 50);
   }
 
   handleAction(action) {
@@ -732,8 +773,22 @@ class GameUI {
         this.render();
         return;
       case 'persuade':
+        const wasActive = this.game.getPlayer(this.game.currentPlayer).allianceCastle.isActive;
         this.game.executeAction('persuade');
-        break;
+        const isNowActive = this.game.getPlayer(this.game.currentPlayer).allianceCastle.isActive;
+
+        this.render();
+
+        // Animate alliance activation if it just became active
+        if (!wasActive && isNowActive) {
+          setTimeout(() => {
+            const player = this.game.getPlayer(this.game.currentPlayer);
+            const castlePrefix = this.getCastlePrefix(player, player.allianceCastle);
+            const castleEl = document.getElementById(`${castlePrefix}-castle`);
+            if (castleEl) this.animateAllianceActivation(castleEl);
+          }, 50);
+        }
+        return;
       case 'threaten':
         this.game.executeAction('threaten');
         break;
@@ -744,23 +799,55 @@ class GameUI {
         break;
       case 'battle':
         this.game.executeAction('battle', action.castle);
-        break;
+        this.render();
+        // Animate fortification battle
+        setTimeout(() => {
+          const player = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
+          const castlePrefix = this.getCastlePrefix(player, action.castle);
+          const fortSlot = document.getElementById(`${castlePrefix}-fort`);
+          if (fortSlot) this.animateFortificationBattle(fortSlot);
+        }, 50);
+        return;
       case 'raid':
         this.game.executeAction('raid', action.castle, action.attackingCastle);
-        break;
+        this.render();
+        // Animate raid impact
+        setTimeout(() => {
+          const player = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
+          const castlePrefix = this.getCastlePrefix(player, action.castle);
+          const castleEl = document.getElementById(`${castlePrefix}-castle`);
+          if (castleEl) this.animateCastleDamage(castleEl, true);
+        }, 50);
+        return;
       case 'raid-no-damage':
         this.game.executeAction('raid-no-damage', action.castle);
         break;
       case 'bring-to-power':
         this.game.executeAction('bring-to-power', action.castle);
-        break;
+        this.render();
+        // Animate royal entrance
+        setTimeout(() => {
+          const player = this.game.getPlayer(this.game.currentPlayer);
+          const castlePrefix = this.getCastlePrefix(player, action.castle);
+          const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
+          const newRoyal = royalsSlot?.querySelector('.card:last-child');
+          if (newRoyal) this.animateRoyalEntrance(newRoyal);
+        }, 50);
+        return;
       case 'assassinate':
         // Show target selection
         this.showTargetSelection(action.targets);
         return;
     }
-    
+
     this.render();
+  }
+
+  // Helper to get castle prefix for animations
+  getCastlePrefix(player, castle) {
+    const prefix = player.id === 1 ? 'p1' : 'p2';
+    const isAlliance = castle === player.allianceCastle;
+    return `${prefix}-${isAlliance ? 'alliance' : 'primary'}`;
   }
 
   showTargetSelection(targets) {
@@ -793,7 +880,7 @@ class GameUI {
     const winner = this.game.getPlayer(this.game.winner);
     const loser = this.game.getPlayer(this.game.winner === 1 ? 2 : 1);
     const playerWon = this.game.winner === 1;
-    
+
     // Different messages based on who won
     if (this.vsAI) {
       if (playerWon) {
@@ -822,8 +909,125 @@ class GameUI {
       `;
       this.gameOverOverlay.classList.remove('player-victory', 'ai-victory');
     }
-    
+
     this.gameOverOverlay.classList.add('active');
+  }
+
+  // ========== ANIMATION HELPERS ==========
+
+  // Animate an element by adding a class and removing it after animation completes
+  animateElement(element, animationClass, duration = 1000) {
+    if (!element) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      element.classList.add(animationClass);
+      setTimeout(() => {
+        element.classList.remove(animationClass);
+        resolve();
+      }, duration);
+    });
+  }
+
+  // Show phase transition banner
+  showPhaseBanner(title, subtitle, icon = '') {
+    // Remove any existing banner
+    const existing = document.querySelector('.phase-banner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.className = 'phase-banner';
+    banner.innerHTML = `
+      ${icon ? `<span class="phase-icon">${icon}</span>` : ''}
+      <div class="phase-banner-title">${title}</div>
+      <div class="phase-banner-subtitle">${subtitle}</div>
+    `;
+
+    document.body.appendChild(banner);
+
+    // Auto-remove after animation
+    setTimeout(() => banner.remove(), 1200);
+  }
+
+  // Animate card draw from deck
+  animateCardDrawFromDeck() {
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    if (drawnCard) {
+      drawnCard.classList.add('card-slide-from-deck', 'card-flipping');
+      setTimeout(() => {
+        drawnCard.classList.remove('card-slide-from-deck', 'card-flipping');
+      }, 600);
+    }
+  }
+
+  // Animate card draw from field
+  animateCardDrawFromField(pileIndex) {
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    if (drawnCard) {
+      drawnCard.classList.add('card-slide-from-field');
+      setTimeout(() => {
+        drawnCard.classList.remove('card-slide-from-field');
+      }, 500);
+    }
+  }
+
+  // Animate castle taking damage
+  animateCastleDamage(castleElement, isRaid = false) {
+    if (!castleElement) return;
+
+    const animClass = isRaid ? 'castle-raid-impact' : 'castle-taking-damage';
+    castleElement.classList.add(animClass, 'castle-damage-flash');
+
+    setTimeout(() => {
+      castleElement.classList.remove(animClass, 'castle-damage-flash');
+    }, 800);
+  }
+
+  // Animate fortification taking damage
+  animateFortificationBattle(fortElement) {
+    if (!fortElement) return;
+
+    fortElement.classList.add('fortification-battle');
+    setTimeout(() => {
+      fortElement.classList.remove('fortification-battle');
+    }, 500);
+  }
+
+  // Animate royal entering castle
+  animateRoyalEntrance(royalElement) {
+    if (!royalElement) return;
+
+    royalElement.classList.add('royal-entering');
+    setTimeout(() => {
+      royalElement.classList.remove('royal-entering');
+    }, 700);
+  }
+
+  // Animate alliance activation
+  animateAllianceActivation(castleElement) {
+    if (!castleElement) return;
+
+    castleElement.classList.add('alliance-activating');
+    setTimeout(() => {
+      castleElement.classList.remove('alliance-activating');
+    }, 1000);
+  }
+
+  // Animate castle destruction
+  animateCastleDestruction(castleElement) {
+    if (!castleElement) return;
+
+    castleElement.classList.add('castle-destroying');
+    // Don't remove this class - it has 'forwards' in animation
+  }
+
+  // Animate number/stat change
+  animateNumberChange(element) {
+    if (!element) return;
+
+    element.classList.add('number-pop');
+    setTimeout(() => {
+      element.classList.remove('number-pop');
+    }, 400);
   }
 }
 
