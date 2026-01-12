@@ -601,11 +601,10 @@ class GameUI {
         btn.addEventListener('click', async () => {
           this.game.phase = 'action'; // Reset phase
 
-          // Animate card to field pile
-          await this.animateCardToFieldPile(i);
-
-          this.game.executeAction('field', i);
-          this.render();
+          // Animate card to field pile with view transition
+          await this.animateCardToFieldPile(i, () => {
+            this.game.executeAction('field', i);
+          });
         });
         this.actionsList.appendChild(btn);
       }
@@ -747,15 +746,13 @@ class GameUI {
         const currentPlayer = this.game.getPlayer(this.game.currentPlayer);
         const allianceCastle = currentPlayer.allianceCastle;
 
-        // Animate card to persuasion track
-        await this.animateCardToPersuasionTrack(allianceCastle, currentPlayer);
-
-        this.game.executeAction('persuade');
-        const isNowActive = this.game.getPlayer(this.game.currentPlayer).allianceCastle.isActive;
-
-        this.render();
+        // Animate card to persuasion track with view transition
+        await this.animateCardToPersuasionTrack(allianceCastle, currentPlayer, () => {
+          this.game.executeAction('persuade');
+        });
 
         // Animate alliance activation if it just became active
+        const isNowActive = this.game.getPlayer(this.game.currentPlayer).allianceCastle.isActive;
         if (!wasActive && isNowActive) {
           setTimeout(() => {
             const player = this.game.getPlayer(this.game.currentPlayer);
@@ -770,27 +767,26 @@ class GameUI {
         const opponent = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
         const opponentAlliance = opponent.allianceCastle;
 
-        // Animate card to opponent's persuasion track
-        await this.animateCardToPersuasionTrack(opponentAlliance, opponent);
-
-        this.game.executeAction('threaten');
-        break;
+        // Animate card to opponent's persuasion track with view transition
+        await this.animateCardToPersuasionTrack(opponentAlliance, opponent, () => {
+          this.game.executeAction('threaten');
+        });
+        return;
 
       case 'fortify':
       case 'upgrade-fortification':
       case 'repair-fortification':
-        // Animate card to fortification
-        await this.animateCardToFortification(action.castle);
-
-        this.game.executeAction(action.type, action.castle);
-        break;
+        // Animate card to fortification with view transition
+        await this.animateCardToFortification(action.castle, () => {
+          this.game.executeAction(action.type, action.castle);
+        });
+        return;
 
       case 'battle':
-        // Animate battle attack
-        await this.animateCardToBattle(action.castle);
-
-        this.game.executeAction('battle', action.castle);
-        this.render();
+        // Animate battle attack with view transition
+        await this.animateCardToBattle(action.castle, () => {
+          this.game.executeAction('battle', action.castle);
+        });
         return;
 
       case 'raid':
@@ -810,20 +806,10 @@ class GameUI {
         break;
 
       case 'bring-to-power':
-        // Animate royal to castle
-        await this.animateCardToRoyalStack(action.castle);
-
-        this.game.executeAction('bring-to-power', action.castle);
-        this.render();
-
-        // Animate royal entrance flourish
-        setTimeout(() => {
-          const player = this.game.getPlayer(this.game.currentPlayer);
-          const castlePrefix = this.getCastlePrefix(player, action.castle);
-          const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
-          const newRoyal = royalsSlot?.querySelector('.card:last-child');
-          if (newRoyal) this.animateRoyalEntrance(newRoyal);
-        }, 50);
+        // Animate royal to castle with view transition
+        await this.animateCardToRoyalStack(action.castle, () => {
+          this.game.executeAction('bring-to-power', action.castle);
+        });
         return;
 
       case 'assassinate':
@@ -874,13 +860,10 @@ class GameUI {
           }
         }
 
-        // Animate assassin to target
-        if (targetRoyalElement) {
-          await this.animateAssassinToTarget(targetRoyalElement);
-        }
-
-        this.game.executeAction('assassinate', target);
-        this.render();
+        // Animate assassin to target with view transition
+        await this.animateAssassinToTarget(targetRoyalElement, () => {
+          this.game.executeAction('assassinate', target);
+        });
       });
       this.actionsList.appendChild(btn);
     });
@@ -1026,151 +1009,136 @@ class GameUI {
     }, 400);
   }
 
-  // Animate card moving from source to destination
-  animateCardMovement(sourceElement, destinationElement, options = {}) {
-    if (!sourceElement || !destinationElement) {
-      return Promise.resolve();
+  // Animate using View Transitions API
+  async animateWithViewTransition(callback) {
+    // Mark the drawn card for transition
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    if (drawnCard) {
+      drawnCard.style.viewTransitionName = 'card-moving';
     }
 
-    return new Promise((resolve) => {
-      // Get positions
-      const sourceRect = sourceElement.getBoundingClientRect();
-      const destRect = destinationElement.getBoundingClientRect();
+    // Use view transition
+    if (document.startViewTransition) {
+      const transition = document.startViewTransition(() => {
+        callback();
+      });
+      await transition.finished;
+    } else {
+      // Direct execution if not supported
+      callback();
+    }
 
-      // Create card clone
-      const clone = sourceElement.cloneNode(true);
-      clone.style.position = 'fixed';
-      clone.style.left = `${sourceRect.left}px`;
-      clone.style.top = `${sourceRect.top}px`;
-      clone.style.width = `${sourceRect.width}px`;
-      clone.style.height = `${sourceRect.height}px`;
-      clone.style.zIndex = '1000';
-      clone.style.pointerEvents = 'none';
-      clone.style.transition = 'all 0.5s ease-out';
+    // Clean up transition name
+    if (drawnCard) {
+      drawnCard.style.viewTransitionName = '';
+    }
+  }
 
-      document.body.appendChild(clone);
-
-      // Animate after a frame
+  // Mark destination element for view transition
+  markDestinationForTransition(element) {
+    if (element) {
+      element.style.viewTransitionName = 'card-moving';
+      // Remove after a frame
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          clone.style.left = `${destRect.left}px`;
-          clone.style.top = `${destRect.top}px`;
-
-          if (options.rotate) {
-            clone.style.transform = 'rotate(90deg)';
-          }
-
-          if (options.scale) {
-            clone.style.transform = (clone.style.transform || '') + ` scale(${options.scale})`;
-          }
-
-          if (options.fadeOut) {
-            clone.style.opacity = '0';
+          if (element) {
+            element.style.viewTransitionName = '';
           }
         });
       });
-
-      // Clean up after animation
-      setTimeout(() => {
-        clone.remove();
-        resolve();
-      }, options.duration || 500);
-    });
+    }
   }
 
   // Animate card to persuasion/threat track
-  async animateCardToPersuasionTrack(targetCastle, targetPlayer) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard) return;
+  async animateCardToPersuasionTrack(targetCastle, targetPlayer, callback) {
+    await this.animateWithViewTransition(() => {
+      callback();
+      this.render();
 
-    const castlePrefix = this.getCastlePrefix(targetPlayer, targetCastle);
-    const trackElement = document.getElementById(`${castlePrefix}-persuasion-bar`);
-
-    if (trackElement) {
-      await this.animateCardMovement(drawnCard, trackElement, {
-        scale: 0.4,
-        duration: 400
-      });
-    }
+      // Mark destination
+      const castlePrefix = this.getCastlePrefix(targetPlayer, targetCastle);
+      const bar = document.getElementById(`${castlePrefix}-persuasion-bar`);
+      this.markDestinationForTransition(bar);
+    });
   }
 
   // Animate card to fortification
-  async animateCardToFortification(targetCastle) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard) return;
-
+  async animateCardToFortification(targetCastle, callback) {
     const player = this.game.getPlayer(this.game.currentPlayer);
-    const castlePrefix = this.getCastlePrefix(player, targetCastle);
-    const fortSlot = document.getElementById(`${castlePrefix}-fort`);
 
-    if (fortSlot) {
-      await this.animateCardMovement(drawnCard, fortSlot, {
-        rotate: true,
-        scale: 0.8,
-        duration: 500
-      });
-    }
+    await this.animateWithViewTransition(() => {
+      callback();
+      this.render();
+
+      // Mark destination
+      const castlePrefix = this.getCastlePrefix(player, targetCastle);
+      const fortSlot = document.getElementById(`${castlePrefix}-fort`);
+      const lastCard = fortSlot?.querySelector('.card:last-child');
+      this.markDestinationForTransition(lastCard);
+    });
   }
 
   // Animate battle attack
-  async animateCardToBattle(targetCastle) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard) return;
-
+  async animateCardToBattle(targetCastle, callback) {
     const opponent = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
-    const castlePrefix = this.getCastlePrefix(opponent, targetCastle);
-    const fortSlot = document.getElementById(`${castlePrefix}-fort`);
 
-    if (fortSlot) {
-      await this.animateCardMovement(drawnCard, fortSlot, {
-        fadeOut: true,
-        duration: 400
-      });
+    await this.animateWithViewTransition(() => {
+      callback();
+      this.render();
 
-      // Then animate fortification battle
-      this.animateFortificationBattle(fortSlot);
-    }
+      // Mark destination fortification for clash animation
+      const castlePrefix = this.getCastlePrefix(opponent, targetCastle);
+      const fortSlot = document.getElementById(`${castlePrefix}-fort`);
+      if (fortSlot) {
+        setTimeout(() => this.animateFortificationBattle(fortSlot), 50);
+      }
+    });
   }
 
   // Animate royal to castle
-  async animateCardToRoyalStack(targetCastle) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard) return;
-
+  async animateCardToRoyalStack(targetCastle, callback) {
     const player = this.game.getPlayer(this.game.currentPlayer);
-    const castlePrefix = this.getCastlePrefix(player, targetCastle);
-    const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
 
-    if (royalsSlot) {
-      await this.animateCardMovement(drawnCard, royalsSlot, {
-        duration: 500
-      });
-    }
+    await this.animateWithViewTransition(() => {
+      callback();
+      this.render();
+
+      // Mark destination and add entrance animation
+      const castlePrefix = this.getCastlePrefix(player, targetCastle);
+      const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
+      const newRoyal = royalsSlot?.querySelector('.card:last-child');
+
+      if (newRoyal) {
+        this.markDestinationForTransition(newRoyal);
+        setTimeout(() => this.animateRoyalEntrance(newRoyal), 50);
+      }
+    });
   }
 
   // Animate assassin to target
-  async animateAssassinToTarget(targetRoyalElement) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard || !targetRoyalElement) return;
+  async animateAssassinToTarget(targetRoyalElement, callback) {
+    await this.animateWithViewTransition(() => {
+      // Mark target before action
+      if (targetRoyalElement) {
+        targetRoyalElement.style.viewTransitionName = 'card-moving';
+      }
 
-    await this.animateCardMovement(drawnCard, targetRoyalElement, {
-      fadeOut: true,
-      duration: 400
+      callback();
+      this.render();
     });
   }
 
   // Animate card to field pile
-  async animateCardToFieldPile(pileIndex) {
-    const drawnCard = this.drawnCardSlot.querySelector('.card');
-    if (!drawnCard) return;
+  async animateCardToFieldPile(pileIndex, callback) {
+    await this.animateWithViewTransition(() => {
+      callback();
+      this.render();
 
-    const fieldPile = this.fieldPiles[pileIndex];
-    if (fieldPile) {
-      await this.animateCardMovement(drawnCard, fieldPile, {
-        scale: 0.9,
-        duration: 400
-      });
-    }
+      // Mark the new top card in the pile
+      const fieldPile = this.fieldPiles[pileIndex];
+      const topCard = fieldPile?.querySelector('.card:last-child');
+      this.markDestinationForTransition(topCard);
+    });
   }
 }
 
