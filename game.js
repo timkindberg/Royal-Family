@@ -1155,7 +1155,8 @@ class AIPlayer {
     this.lastAction = null;
     
     // Personality variance (how much randomness in decisions)
-    this.variance = 3; // ±3 points random variance
+    // AI FIX #5: Reduced variance for more consistent decisions
+    this.variance = 1; // ±1 points random variance (was 3)
     this.similarThreshold = 5; // Actions within 5 points are "similar"
   }
 
@@ -1311,9 +1312,9 @@ class AIPlayer {
       case AIPlayer.MOODS.DEFENSIVE:
         if (['fortify', 'repair-fortification', 'upgrade-fortification'].includes(actionType)) {
           modifier = 6;
-        } else if (['raid', 'battle'].includes(actionType)) {
-          modifier = -4;
         }
+        // AI FIX #3: Removed raid/battle penalty
+        // Being defensive doesn't mean refusing to attack when it's smart!
         break;
         
       case AIPlayer.MOODS.AMBITIOUS:
@@ -1417,42 +1418,22 @@ class AIPlayer {
       if (pile.length > 0) {
         const card = pile[pile.length - 1];
         let score = this.evaluateCard(card);
-        
-        // DENIAL BONUS: Add value for denying opponent a useful card
-        const denialValue = this.evaluateCardForOpponent(card);
-        if (denialValue >= 15) {
-          // This card would be GREAT for opponent - take it to deny them!
-          score += denialValue * 0.5; // Add 50% of opponent's value as denial bonus
-        }
-        
-        // UNCOVER AWARENESS: Consider what's underneath this card
-        // Turn position matters! After turn 3/3, new flop covers everything.
-        // - Turn 1/3: Might grab it turn 3/3, but opponent might cover it turn 2/3
-        // - Turn 2/3 or 3/3: Flop will bury it, need to re-uncover next round
+
+        // AI FIX #10: Improved uncover logic
+        // Evaluate what's underneath using full card evaluation, not flat bonuses
+        // Uncovering their Queen is much worse than uncovering their 4
         if (pile.length > 1) {
           const cardUnderneath = pile[pile.length - 2];
           const uncoverValueForOpponent = this.evaluateCardForOpponent(cardUnderneath);
           const uncoverValueForMe = this.evaluateCard(cardUnderneath);
-          
-          const turnIndex = this.game.currentTurnIndex; // 0, 1, or 2
-          
-          // Penalize if we'd uncover something good for opponent
-          if (uncoverValueForOpponent >= 12) {
-            // Turn 1: They'll likely grab it immediately on turn 2
-            // Turns 2-3: Flop coming, less impactful
-            const penaltyMultiplier = turnIndex === 0 ? 0.5 : 0.2;
-            score -= uncoverValueForOpponent * 0.4 * penaltyMultiplier;
-          }
-          
-          // Bonus if we'd uncover something good for us
-          if (uncoverValueForMe >= 15) {
-            // Turn 1/3: ~40% chance we get it (opponent might cover to deny, or be distracted)
-            // Turns 2-3/3: ~10% chance (flop coming, need perfect next round)
-            const multiplier = turnIndex === 0 ? 0.4 : 0.1;
-            score += uncoverValueForMe * multiplier;
-          }
+
+          // Penalty for uncovering opponent's valuable cards (scales with card value)
+          score -= uncoverValueForOpponent * 0.3;
+
+          // Bonus for uncovering our valuable cards (scales with card value)
+          score += uncoverValueForMe * 0.2;
         }
-        
+
         score = this.addVariance(score); // Add randomness
         fieldOptions.push({ index: i, card, score });
       }
@@ -1675,6 +1656,39 @@ class AIPlayer {
     return count;
   }
 
+  // AI FIX #1: Filter out objectively bad choices before scoring
+  filterSuboptimalActions(actions) {
+    // Check if we have raid available (real raid, not raid-no-damage)
+    const hasRaid = actions.some(a => a.type === 'raid');
+
+    if (hasRaid) {
+      // If we can raid (deal permanent damage), remove ALL battle actions
+      // Raiding unfortified castle is ALWAYS better than battling fortified one
+      // NOTE: We don't filter battles when only raid-no-damage is available,
+      // because raid-no-damage doesn't deal permanent damage either
+      return actions.filter(a => a.type !== 'battle');
+    }
+
+    // Check if we have justified fortify (castle has royals but no fortification)
+    const hasJustifiedFortify = actions.some(a => {
+      if (a.type !== 'fortify' && a.type !== 'upgrade-fortification') return false;
+      const castle = a.castle;
+      return castle && castle.royalFamily.length > 0 && !castle.fortification;
+    });
+
+    if (hasJustifiedFortify) {
+      // If we have royals needing protection, remove redundant fortify options
+      return actions.filter(a => {
+        if (a.type !== 'fortify' && a.type !== 'upgrade-fortification') return true;
+        const castle = a.castle;
+        // Keep only fortifies for castles with royals but no fortification
+        return castle && castle.royalFamily.length > 0 && !castle.fortification;
+      });
+    }
+
+    return actions;
+  }
+
   // Decide which action to take
   async decideAction() {
     await this.delay(this.thinkingDelay / 2);
@@ -1684,8 +1698,11 @@ class AIPlayer {
 
     if (enabledActions.length === 0) return;
 
+    // AI FIX #1: Filter out objectively bad choices before scoring
+    const filteredActions = this.filterSuboptimalActions(enabledActions);
+
     // Score each action with mood modifiers and variance
-    const scoredActions = enabledActions.map(action => {
+    const scoredActions = filteredActions.map(action => {
       let score = this.scoreAction(action);
       score = this.applyMoodModifier(action.type, score); // Apply mood
       score = this.addVariance(score); // Add randomness
@@ -1725,19 +1742,19 @@ class AIPlayer {
         let bestCoverValue = 0;
         let hasAssassinOnField = false;
         let hasDesirableRoyalOnField = false;
-        
+
         for (let i = 0; i < 3; i++) {
           const pile = this.game.fieldPiles[i];
           if (pile.length > 0) {
             const topCard = pile[pile.length - 1];
             const coverVal = this.evaluateCardForOpponent(topCard);
             bestCoverValue = Math.max(bestCoverValue, coverVal);
-            
+
             // Track if there's an assassin we could cover
             if (topCard.value === '2') {
               hasAssassinOnField = true;
             }
-            
+
             // Track if there's a royal we'd want for ourselves
             if (topCard.isRoyal) {
               const ourCastle = this.player.getCastleBySuit(topCard.suit);
@@ -1747,15 +1764,15 @@ class AIPlayer {
             }
           }
         }
-        
+
         let score = 1 + bestCoverValue * 0.3;
-        
+
         // STRATEGIC PLAY: If there's both an assassin AND a royal we want on the field,
         // covering the assassin first is smart - makes it safe to grab the royal next turn!
         if (hasAssassinOnField && hasDesirableRoyalOnField) {
           score += 12; // Boost field action to set up the safe royal grab
         }
-        
+
         if (isLastTurn) score *= 0.1;
         return Math.min(score, 20); // Cap raised to allow strategic plays
       }
@@ -1785,13 +1802,14 @@ class AIPlayer {
         // HEAVY PENALTY for placing in unfortified castle when assassin is visible
         // (Opponent could grab the assassin and kill the royal immediately!)
         else {
-          const fieldHasAssassin = this.game.fieldPiles.some(pile => 
+          const fieldHasAssassin = this.game.fieldPiles.some(pile =>
             pile.length > 0 && pile[pile.length - 1].value === '2'
           );
           if (fieldHasAssassin) {
-            // Reduce score dramatically - should fortify first if possible!
-            // First royal: 22 - 18 = 4, Second: 12 - 18 = -6, Third: 6 - 18 = -12
-            score -= 18;
+            // AI FIX #7: Make penalty severe enough to NEVER place unprotected royals
+            // Combined with Fix #7 (fortify scores 60 when assassin visible),
+            // AI will ALWAYS fortify first instead of placing royal
+            score -= 30; // Was -18, now ensures negative score even for first royal
           }
         }
         
@@ -1838,7 +1856,22 @@ class AIPlayer {
       case 'fortify': {
         const castle = action.castle;
         const hasRoyals = castle && castle.royalFamily.length > 0;
-        
+
+        // AI FIX #2: Don't fortify if already protected and not under attack
+        if (castle.fortification && castle.fortificationDamage.length === 0) {
+          return -5; // Already protected, don't waste the card
+        }
+
+        // AI FIX #7: URGENT fortify when assassin visible and royals unprotected
+        const fieldHasAssassin = this.game.fieldPiles.some(pile =>
+          pile.length > 0 && pile[pile.length - 1].value === '2'
+        );
+
+        if (hasRoyals && !castle.fortification && fieldHasAssassin) {
+          // CRITICAL: Assassin on field + unprotected royals = TOP PRIORITY!
+          return 60; // Higher than raid (45) - protect first, then attack
+        }
+
         if (hasRoyals) {
           // URGENT: Protect our royals!
           return 25 + (card.numericValue * 0.3);
@@ -1850,7 +1883,12 @@ class AIPlayer {
       case 'upgrade-fortification': {
         const castle = action.castle;
         const hasRoyals = castle && castle.royalFamily.length > 0;
-        
+
+        // AI FIX #2: Only upgrade if under active threat
+        if (castle.fortificationDamage.length === 0) {
+          return 5; // Not under attack, low priority
+        }
+
         if (hasRoyals) {
           return 18 + (card.numericValue * 0.2);
         }
@@ -1891,20 +1929,22 @@ class AIPlayer {
         const attackingCastle = action.attackingCastle;
         const enemyHasRoyals = targetCastle?.royalFamily.length > 0;
         const ourRoyals = attackingCastle?.royalFamily.length || 0;
-        
-        // Base high priority - we can deal permanent damage
-        let score = 30;
-        
+
+        // AI FIX #6: Boost raid scoring - permanent damage is THE most important action!
+        // Old: 30-38, but persuade scored 40, so AI preferred building over attacking
+        // New: 45+ to make raids top priority
+        let score = 45;
+
         // Even better if we can capture/kill their royals
         if (enemyHasRoyals) {
-          score += 8;
+          score += 10;
         }
-        
-        // Slightly less valuable if we might lose our royal in the raid
+
+        // Don't penalize single royal raids as much - damage is damage
         if (ourRoyals === 1) {
-          score -= 5; // Risk of losing our only royal
+          score -= 2; // Small risk adjustment (was -5)
         }
-        
+
         return score;
       }
 
@@ -1961,15 +2001,15 @@ class AIPlayer {
   // Decide which field pile to place card on
   async decideFieldPile() {
     await this.delay(this.thinkingDelay / 2);
-    
+
     // Check if it's the last turn of the round - covering is less valuable
     // because the next flop will cover everything anyway
     const isLastTurn = this.game.currentTurnIndex >= this.game.turnsPerRound;
-    
-    // Check for strategic situation: assassin + desirable royal both on field
-    let hasDesirableRoyal = false;
+
+    // Find assassin pile index
     let assassinPileIndex = -1;
-    
+    let hasDesirableRoyalOnField = false;
+
     for (let i = 0; i < 3; i++) {
       const pile = this.game.fieldPiles[i];
       if (pile.length > 0) {
@@ -1980,17 +2020,27 @@ class AIPlayer {
         if (topCard.isRoyal) {
           const ourCastle = this.player.getCastleBySuit(topCard.suit);
           if (ourCastle && ourCastle.isActive && !ourCastle.destroyed) {
-            hasDesirableRoyal = true;
+            hasDesirableRoyalOnField = true;
           }
         }
       }
     }
-    
-    // STRATEGIC: If there's a royal we want AND an assassin, cover the assassin!
-    if (hasDesirableRoyal && assassinPileIndex >= 0 && !isLastTurn) {
-      this.game.phase = 'action';
-      this.game.executeAction('field', assassinPileIndex);
-      return;
+
+    // AI FIX #11: Strategic assassin burial
+    // If we're fielding our own usable royal AND assassin is visible, cover the assassin!
+    // This lets us safely bring a royal to power on our next turn.
+    const drawnCard = this.game.drawnCard;
+    const isOurUsableRoyal = drawnCard && drawnCard.isRoyal &&
+      this.player.getCastleBySuit(drawnCard.suit)?.isActive &&
+      !this.player.getCastleBySuit(drawnCard.suit)?.destroyed;
+
+    if (assassinPileIndex >= 0 && !isLastTurn) {
+      // Cover assassin if: we're fielding our own royal OR there's a royal we want on field
+      if (isOurUsableRoyal || hasDesirableRoyalOnField) {
+        this.game.phase = 'action';
+        this.game.executeAction('field', assassinPileIndex);
+        return;
+      }
     }
     
     // Evaluate each pile for "cover value" - how much we hurt opponent by covering it
@@ -2014,16 +2064,10 @@ class AIPlayer {
       pileOptions.push({ index: i, coverValue, size: pile.length });
     }
     
-    // Sort by cover value (highest = best pile to cover)
-    pileOptions.sort((a, b) => {
-      // Primary: cover value
-      if (b.coverValue !== a.coverValue) {
-        return b.coverValue - a.coverValue;
-      }
-      // Tiebreaker: prefer piles with more cards (bury our card deeper)
-      return b.size - a.size;
-    });
-    
+    // AI FIX #10: Sort by cover value only (pile depth doesn't matter)
+    // Pick pile with highest cover value = bury opponent's best card
+    pileOptions.sort((a, b) => b.coverValue - a.coverValue);
+
     const targetPile = pileOptions[0].index;
     
     this.game.phase = 'action';
@@ -2037,26 +2081,23 @@ class AIPlayer {
     const options = this.game.getRaidOptions();
     if (options.length === 0) return;
 
-    // Priority: kill > kidnap > rescue > skip
-    // (Killing is better than kidnapping since killed royals are permanently gone)
-    const killOption = options.find(o => o.type === 'kill');
-    const kidnapOption = options.find(o => o.type === 'kidnap');
+    const killOptions = options.filter(o => o.type === 'kill');
+    const kidnapOptions = options.filter(o => o.type === 'kidnap');
     const rescueOption = options.find(o => o.type === 'rescue');
 
-    if (killOption) {
-      // Kill the highest rank royal
-      const killOptions = options.filter(o => o.type === 'kill');
-      const best = killOptions.reduce((a, b) => 
-        ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
-      );
-      this.game.executeRaidChoice('kill', best.target);
-    } else if (rescueOption) {
-      // Rescue our imprisoned royal!
+    // Always rescue first
+    if (rescueOption) {
       this.game.executeRaidChoice('rescue');
-    } else if (kidnapOption) {
-      // Kidnap the highest rank royal (less preferred than kill)
-      const kidnapOptions = options.filter(o => o.type === 'kidnap');
-      const best = kidnapOptions.reduce((a, b) => 
+      return;
+    }
+
+    if (killOptions.length > 0) {
+      // AI FIX #4: Strategic kill selection
+      const best = this.chooseBestKillTarget(killOptions);
+      this.game.executeRaidChoice('kill', best.target);
+    } else if (kidnapOptions.length > 0) {
+      // Kidnap highest rank (less preferred than kill)
+      const best = kidnapOptions.reduce((a, b) =>
         ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
       );
       this.game.executeRaidChoice('kidnap', best.target);
@@ -2064,6 +2105,23 @@ class AIPlayer {
       // Skip if no beneficial action
       this.game.executeRaidChoice('skip');
     }
+  }
+
+  // AI FIX #4: Choose kill target strategically
+  chooseBestKillTarget(killOptions) {
+    const raidedCastle = this.game.raidTarget;
+
+    // Strategy: Prefer killing the ONLY royal in a castle over killing highest rank
+    // Eliminating a castle's attack capability is better than reducing strength
+    if (raidedCastle.royalFamily.length === 1) {
+      // This is the only royal - killing it eliminates castle's raid capability!
+      return killOptions[0];
+    }
+
+    // Otherwise, kill highest rank (existing behavior)
+    return killOptions.reduce((a, b) =>
+      ROYAL_HIERARCHY[a.target.value] > ROYAL_HIERARCHY[b.target.value] ? a : b
+    );
   }
 
   // Decide which royal to sacrifice to assassin
