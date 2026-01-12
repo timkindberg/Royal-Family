@@ -1452,3 +1452,387 @@ body::before {
   color: var(--gold);
   font-weight: bold;
 }
+
+/* ========== CARD MOVEMENT ANIMATIONS ========== */
+
+/* Card flip animation when drawing from deck */
+@keyframes cardFlip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.card-flipping {
+  animation: cardFlip 0.6s ease;
+}
+
+/* Card slide from deck to drawn slot */
+@keyframes slideFromDeck {
+  0% {
+    transform: translate(-200px, 0) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+.card-slide-from-deck {
+  animation: slideFromDeck 0.5s ease-out;
+}
+
+/* Card slide from field pile to drawn slot */
+@keyframes slideFromField {
+  0% {
+    transform: translate(var(--slide-x, 0), var(--slide-y, 0)) scale(0.9);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+.card-slide-from-field {
+  animation: slideFromField 0.5s ease-out;
+}
+
+/* Card slide to field pile (discard) */
+@keyframes slideToField {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--slide-x, 0), var(--slide-y, 0)) scale(0.9) rotate(5deg);
+    opacity: 0.8;
+  }
+}
+
+.card-slide-to-field {
+  animation: slideToField 0.4s ease-in;
+}
+
+/* ========== COMBAT ANIMATIONS ========== */
+
+/* Castle damage shake */
+@keyframes castleDamage {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  30% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  50% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { transform: translateX(0); }
+}
+
+.castle-taking-damage {
+  animation: castleDamage 0.6s ease;
+}
+
+/* Red flash overlay for damage */
+@keyframes damageFlash {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(220, 38, 38, 0);
+    border-color: var(--border-subtle);
+  }
+  20%, 60% {
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.8), inset 0 0 30px rgba(220, 38, 38, 0.3);
+    border-color: #dc2626;
+  }
+}
+
+.castle-damage-flash {
+  animation: damageFlash 0.8s ease;
+}
+
+/* Raid impact effect - explosion-style */
+@keyframes raidImpact {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.15);
+    filter: brightness(1.5);
+  }
+  50% {
+    transform: scale(0.95);
+    filter: brightness(1.2);
+  }
+  75% {
+    transform: scale(1.05);
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.castle-raid-impact {
+  animation: raidImpact 0.7s ease, damageFlash 0.8s ease;
+}
+
+/* Battle clash effect on fortifications */
+@keyframes battleClash {
+  0%, 100% { transform: rotate(90deg) scale(1); }
+  25% { transform: rotate(85deg) scale(1.1); }
+  50% { transform: rotate(95deg) scale(1.05); }
+  75% { transform: rotate(88deg) scale(1.08); }
+}
+
+.fortification-battle {
+  animation: battleClash 0.5s ease;
+}
+
+/* ========== PHASE TRANSITION BANNER ========== */
+
+.phase-banner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.95), rgba(37, 37, 50, 0.95));
+  border: 3px solid var(--gold);
+  border-radius: 12px;
+  padding: 30px 60px;
+  text-align: center;
+  z-index: 999;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 100px rgba(212, 175, 55, 0.3);
+  animation: phaseBannerSlide 1.2s ease;
+  pointer-events: none;
+}
+
+@keyframes phaseBannerSlide {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+.phase-banner-title {
+  font-family: 'Cinzel', serif;
+  font-size: 3rem;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+  margin-bottom: 10px;
+  letter-spacing: 0.1em;
+}
+
+.phase-banner-subtitle {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Action icons for phase banners */
+.phase-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+}
+
+/* ========== CARD INTERACTION HIGHLIGHTS ========== */
+
+/* Hover lift for interactive cards */
+.card.clickable {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.card.clickable:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px var(--gold);
+  filter: brightness(1.1);
+  z-index: 10;
+}
+
+/* Card selected state */
+.card-selected {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 0 30px var(--gold), 0 8px 30px rgba(0, 0, 0, 0.6);
+  border: 2px solid var(--gold);
+}
+
+/* Invalid move shake */
+@keyframes invalidShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.card-invalid {
+  animation: invalidShake 0.3s ease;
+}
+
+/* ========== POINT COUNTER ANIMATIONS ========== */
+
+/* Number tick-up animation */
+@keyframes numberPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); color: var(--gold-light); }
+  100% { transform: scale(1); }
+}
+
+.number-pop {
+  animation: numberPop 0.4s ease;
+}
+
+/* Persuasion/Threat point added effect */
+@keyframes pointAdded {
+  0% {
+    transform: translateY(-10px) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(0) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.point-added {
+  animation: pointAdded 0.5s ease;
+}
+
+/* ========== SPECIAL EFFECTS ========== */
+
+/* Royal entrance flourish */
+@keyframes royalEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.8) rotate(-10deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.1) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.royal-entering {
+  animation: royalEntrance 0.7s ease;
+}
+
+/* Castle destruction effect */
+@keyframes castleDestroy {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1) rotate(2deg);
+  }
+  50% {
+    transform: scale(0.95) rotate(-2deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(1deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+}
+
+.castle-destroying {
+  animation: castleDestroy 1s ease-out forwards;
+}
+
+/* Alliance activation beam */
+@keyframes allianceActivate {
+  0% {
+    box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(212, 175, 55, 0.9), inset 0 0 40px rgba(212, 175, 55, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.2);
+  }
+}
+
+.alliance-activating {
+  animation: allianceActivate 1s ease;
+}
+
+/* ========== VIEW TRANSITIONS ========== */
+
+/* Configure view transition for card movements */
+::view-transition-old(card-moving),
+::view-transition-new(card-moving),
+::view-transition-old(card-moving-dest),
+::view-transition-new(card-moving-dest) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(card-moving) {
+  animation-name: fade-out-scale;
+}
+
+::view-transition-new(card-moving) {
+  animation-name: fade-in-scale;
+}
+
+::view-transition-old(card-moving-dest) {
+  animation-name: fade-in-scale;
+}
+
+::view-transition-new(card-moving-dest) {
+  animation-name: fade-out-scale;
+}
+
+/* Create a view transition group that morphs between card-moving and card-moving-dest */
+::view-transition-group(card-moving) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-group(card-moving-dest) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes fade-out-scale {
+  to {
+    opacity: 0.3;
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0.3;
+  }
+}
