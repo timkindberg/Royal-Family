@@ -723,42 +723,15 @@ class GameUI {
     setTimeout(() => this.animateCardDrawFromDeck(), 50);
   }
 
-  async handleFieldClick(pileIndex) {
+  handleFieldClick(pileIndex) {
     if (this.game.phase !== 'draw') return;
     if (this.game.fieldPiles[pileIndex].length === 0) return;
 
-    // Get the source card before moving it
-    const fieldPile = this.fieldPiles[pileIndex];
-    const sourceCard = fieldPile?.querySelector('.card:last-child');
-
-    if (sourceCard && document.startViewTransition) {
-      // Mark source for transition
-      sourceCard.style.viewTransitionName = 'card-moving';
-
-      // Use view transition
-      const transition = document.startViewTransition(() => {
-        this.game.drawFromField(pileIndex);
-        this.render();
-
-        // Mark destination
-        const drawnCard = this.drawnCardSlot.querySelector('.card');
-        if (drawnCard) {
-          drawnCard.style.viewTransitionName = 'card-moving';
-        }
-      });
-
-      await transition.finished;
-
-      // Clean up
-      if (sourceCard) sourceCard.style.viewTransitionName = '';
-      const drawnCard = this.drawnCardSlot.querySelector('.card');
-      if (drawnCard) drawnCard.style.viewTransitionName = '';
-    } else {
-      // No view transitions support
-      this.game.drawFromField(pileIndex);
-      this.render();
-      setTimeout(() => this.animateCardDrawFromDeck(), 50);
-    }
+    // Don't use view transitions for player draws - causes timing issues
+    // Just use simple animation
+    this.game.drawFromField(pileIndex);
+    this.render();
+    setTimeout(() => this.animateCardDrawFromDeck(), 50);
   }
 
   async handleAction(action) {
@@ -1067,32 +1040,15 @@ class GameUI {
   }
 
   async aiDrawFromField(pileIndex) {
-    // Get the source card before moving it
-    const fieldPile = this.fieldPiles[pileIndex];
-    const sourceCard = fieldPile?.querySelector('.card:last-child');
+    // Don't use view transitions - causes conflicts with player event handlers
+    // Just draw and render, animation will happen via CSS
+    this.game.drawFromField(pileIndex);
+    this.render();
+    await this.delay(300); // Small delay for visual feedback
+  }
 
-    if (sourceCard && document.startViewTransition) {
-      sourceCard.style.viewTransitionName = 'card-moving';
-
-      const transition = document.startViewTransition(() => {
-        this.game.drawFromField(pileIndex);
-        this.render();
-
-        const drawnCard = this.drawnCardSlot.querySelector('.card');
-        if (drawnCard) {
-          drawnCard.style.viewTransitionName = 'card-moving';
-        }
-      });
-
-      await transition.finished;
-
-      if (sourceCard) sourceCard.style.viewTransitionName = '';
-      const drawnCard = this.drawnCardSlot.querySelector('.card');
-      if (drawnCard) drawnCard.style.viewTransitionName = '';
-    } else {
-      this.game.drawFromField(pileIndex);
-      this.render();
-    }
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   async aiExecuteAction(actionType, target = null, additionalTarget = null) {
@@ -1209,18 +1165,28 @@ class GameUI {
   // Animate battle attack
   async animateCardToBattle(targetCastle, callback) {
     const opponent = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
+    const castlePrefix = this.getCastlePrefix(opponent, targetCastle);
+    const fortSlot = document.getElementById(`${castlePrefix}-fort`);
+    const fortCard = fortSlot?.querySelector('.card:last-child');
+
+    // Mark destination before transition
+    if (fortCard) {
+      fortCard.style.viewTransitionName = 'card-moving-dest';
+    }
 
     await this.animateWithViewTransition(() => {
       callback();
       this.render();
 
-      // Mark destination fortification for clash animation
-      const castlePrefix = this.getCastlePrefix(opponent, targetCastle);
-      const fortSlot = document.getElementById(`${castlePrefix}-fort`);
-      if (fortSlot) {
-        setTimeout(() => this.animateFortificationBattle(fortSlot), 50);
+      // Animate fortification clash after transition
+      const newFortSlot = document.getElementById(`${castlePrefix}-fort`);
+      if (newFortSlot) {
+        setTimeout(() => this.animateFortificationBattle(newFortSlot), 50);
       }
     });
+
+    // Clean up
+    if (fortCard) fortCard.style.viewTransitionName = '';
   }
 
   // Animate royal to castle
@@ -1245,15 +1211,18 @@ class GameUI {
 
   // Animate assassin to target
   async animateAssassinToTarget(targetRoyalElement, callback) {
-    await this.animateWithViewTransition(() => {
-      // Mark target before action
-      if (targetRoyalElement) {
-        targetRoyalElement.style.viewTransitionName = 'card-moving';
-      }
+    // Mark target royal as destination before transition
+    if (targetRoyalElement) {
+      targetRoyalElement.style.viewTransitionName = 'card-moving-dest';
+    }
 
+    await this.animateWithViewTransition(() => {
       callback();
       this.render();
     });
+
+    // Clean up
+    if (targetRoyalElement) targetRoyalElement.style.viewTransitionName = '';
   }
 
   // Animate card to field pile

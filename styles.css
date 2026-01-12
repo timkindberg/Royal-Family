@@ -1791,7 +1791,9 @@ body::before {
 
 /* Configure view transition for card movements */
 ::view-transition-old(card-moving),
-::view-transition-new(card-moving) {
+::view-transition-new(card-moving),
+::view-transition-old(card-moving-dest),
+::view-transition-new(card-moving-dest) {
   animation-duration: 0.4s;
   animation-timing-function: ease-out;
 }
@@ -1804,14 +1806,33 @@ body::before {
   animation-name: fade-in-scale;
 }
 
+::view-transition-old(card-moving-dest) {
+  animation-name: fade-in-scale;
+}
+
+::view-transition-new(card-moving-dest) {
+  animation-name: fade-out-scale;
+}
+
+/* Create a view transition group that morphs between card-moving and card-moving-dest */
+::view-transition-group(card-moving) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-group(card-moving-dest) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
 @keyframes fade-out-scale {
   to {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 }
 
 @keyframes fade-in-scale {
   from {
-    opacity: 0.5;
+    opacity: 0.3;
   }
 }
