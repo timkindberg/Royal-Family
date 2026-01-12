@@ -719,19 +719,31 @@ class GameUI {
     this.game.drawFromDeck();
     this.render();
 
-    // Animate card draw with flip
-    setTimeout(() => this.animateCardDrawFromDeck(), 50);
+    // Animate card draw with flip - no slide since we don't know deck position
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    if (drawnCard) {
+      drawnCard.classList.add('card-flipping');
+      setTimeout(() => {
+        drawnCard.classList.remove('card-flipping');
+      }, 600);
+    }
   }
 
   handleFieldClick(pileIndex) {
     if (this.game.phase !== 'draw') return;
     if (this.game.fieldPiles[pileIndex].length === 0) return;
 
-    // Don't use view transitions for player draws - causes timing issues
-    // Just use simple animation
     this.game.drawFromField(pileIndex);
     this.render();
-    setTimeout(() => this.animateCardDrawFromDeck(), 50);
+
+    // Animate card draw with flip
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    if (drawnCard) {
+      drawnCard.classList.add('card-flipping');
+      setTimeout(() => {
+        drawnCard.classList.remove('card-flipping');
+      }, 600);
+    }
   }
 
   async handleAction(action) {
@@ -1135,107 +1147,298 @@ class GameUI {
 
   // Animate card to persuasion/threat track
   async animateCardToPersuasionTrack(targetCastle, targetPlayer, callback) {
-    await this.animateWithViewTransition(() => {
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    const castlePrefix = this.getCastlePrefix(targetPlayer, targetCastle);
+    const targetBar = document.getElementById(`${castlePrefix}-persuasion-bar`);
+
+    if (drawnCard && targetBar && document.startViewTransition) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
+
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.4s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
 
-      // Mark destination
-      const castlePrefix = this.getCastlePrefix(targetPlayer, targetCastle);
-      const bar = document.getElementById(`${castlePrefix}-persuasion-bar`);
-      this.markDestinationForTransition(bar);
-    });
+      // Animate clone to target
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const targetRect = targetBar.getBoundingClientRect();
+          clone.style.left = `${targetRect.left}px`;
+          clone.style.top = `${targetRect.top}px`;
+          clone.style.transform = 'scale(0.3)';
+          clone.style.opacity = '0.5';
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 400);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 
   // Animate card to fortification
   async animateCardToFortification(targetCastle, callback) {
     const player = this.game.getPlayer(this.game.currentPlayer);
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    const castlePrefix = this.getCastlePrefix(player, targetCastle);
+    const fortSlot = document.getElementById(`${castlePrefix}-fort`);
 
-    await this.animateWithViewTransition(() => {
+    if (drawnCard && fortSlot) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
+
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.5s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
 
-      // Mark destination
-      const castlePrefix = this.getCastlePrefix(player, targetCastle);
-      const fortSlot = document.getElementById(`${castlePrefix}-fort`);
-      const lastCard = fortSlot?.querySelector('.card:last-child');
-      this.markDestinationForTransition(lastCard);
-    });
+      // Animate clone to fortification
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const newFortSlot = document.getElementById(`${castlePrefix}-fort`);
+          if (newFortSlot) {
+            const targetRect = newFortSlot.getBoundingClientRect();
+            clone.style.left = `${targetRect.left}px`;
+            clone.style.top = `${targetRect.top}px`;
+            clone.style.transform = 'rotate(90deg) scale(0.85)';
+          }
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 500);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 
   // Animate battle attack
   async animateCardToBattle(targetCastle, callback) {
     const opponent = this.game.getPlayer(this.game.currentPlayer === 1 ? 2 : 1);
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
     const castlePrefix = this.getCastlePrefix(opponent, targetCastle);
     const fortSlot = document.getElementById(`${castlePrefix}-fort`);
-    const fortCard = fortSlot?.querySelector('.card:last-child');
 
-    // Mark destination before transition
-    if (fortCard) {
-      fortCard.style.viewTransitionName = 'card-moving-dest';
-    }
+    if (drawnCard && fortSlot) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
 
-    await this.animateWithViewTransition(() => {
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.4s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
 
-      // Animate fortification clash after transition
-      const newFortSlot = document.getElementById(`${castlePrefix}-fort`);
-      if (newFortSlot) {
-        setTimeout(() => this.animateFortificationBattle(newFortSlot), 50);
-      }
-    });
+      // Animate clone to fortification
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const newFortSlot = document.getElementById(`${castlePrefix}-fort`);
+          if (newFortSlot) {
+            const targetRect = newFortSlot.getBoundingClientRect();
+            clone.style.left = `${targetRect.left}px`;
+            clone.style.top = `${targetRect.top}px`;
+            clone.style.opacity = '0';
 
-    // Clean up
-    if (fortCard) fortCard.style.viewTransitionName = '';
+            // Animate fortification clash
+            setTimeout(() => this.animateFortificationBattle(newFortSlot), 200);
+          }
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 400);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 
   // Animate royal to castle
   async animateCardToRoyalStack(targetCastle, callback) {
     const player = this.game.getPlayer(this.game.currentPlayer);
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    const castlePrefix = this.getCastlePrefix(player, targetCastle);
+    const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
 
-    await this.animateWithViewTransition(() => {
+    if (drawnCard && royalsSlot) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
+
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.5s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
 
-      // Mark destination and add entrance animation
-      const castlePrefix = this.getCastlePrefix(player, targetCastle);
-      const royalsSlot = document.getElementById(`${castlePrefix}-royals`);
-      const newRoyal = royalsSlot?.querySelector('.card:last-child');
+      // Animate clone to royal stack
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const newRoyalsSlot = document.getElementById(`${castlePrefix}-royals`);
+          if (newRoyalsSlot) {
+            const targetRect = newRoyalsSlot.getBoundingClientRect();
+            clone.style.left = `${targetRect.left}px`;
+            clone.style.top = `${targetRect.top}px`;
+            clone.style.opacity = '0';
 
-      if (newRoyal) {
-        this.markDestinationForTransition(newRoyal);
-        setTimeout(() => this.animateRoyalEntrance(newRoyal), 50);
-      }
-    });
+            // Add entrance animation to the new royal card
+            const newRoyal = newRoyalsSlot.querySelector('.card:last-child');
+            if (newRoyal) {
+              setTimeout(() => this.animateRoyalEntrance(newRoyal), 300);
+            }
+          }
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 500);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 
   // Animate assassin to target
   async animateAssassinToTarget(targetRoyalElement, callback) {
-    // Mark target royal as destination before transition
-    if (targetRoyalElement) {
-      targetRoyalElement.style.viewTransitionName = 'card-moving-dest';
-    }
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
 
-    await this.animateWithViewTransition(() => {
+    if (drawnCard && targetRoyalElement) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
+
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.4s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
-    });
 
-    // Clean up
-    if (targetRoyalElement) targetRoyalElement.style.viewTransitionName = '';
+      // Animate clone to target royal
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const targetRect = targetRoyalElement.getBoundingClientRect();
+          clone.style.left = `${targetRect.left}px`;
+          clone.style.top = `${targetRect.top}px`;
+          clone.style.transform = 'scale(1.2)';
+          clone.style.opacity = '0';
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 400);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 
   // Animate card to field pile
   async animateCardToFieldPile(pileIndex, callback) {
-    await this.animateWithViewTransition(() => {
+    const drawnCard = this.drawnCardSlot.querySelector('.card');
+    const targetPile = this.fieldPiles[pileIndex];
+
+    if (drawnCard && targetPile) {
+      // Clone the card to animate
+      const clone = drawnCard.cloneNode(true);
+      clone.style.position = 'fixed';
+      clone.style.zIndex = '1000';
+      clone.style.pointerEvents = 'none';
+
+      const rect = drawnCard.getBoundingClientRect();
+      clone.style.left = `${rect.left}px`;
+      clone.style.top = `${rect.top}px`;
+      clone.style.width = `${rect.width}px`;
+      clone.style.height = `${rect.height}px`;
+      clone.style.transition = 'all 0.4s ease-out';
+
+      document.body.appendChild(clone);
+
+      // Execute action and render
       callback();
       this.render();
 
-      // Mark the new top card in the pile
-      const fieldPile = this.fieldPiles[pileIndex];
-      const topCard = fieldPile?.querySelector('.card:last-child');
-      this.markDestinationForTransition(topCard);
-    });
+      // Animate clone to target pile
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          const pileRect = this.fieldPiles[pileIndex].getBoundingClientRect();
+          clone.style.left = `${pileRect.left}px`;
+          clone.style.top = `${pileRect.top}px`;
+          clone.style.transform = 'scale(0.95) rotate(5deg)';
+
+          setTimeout(() => {
+            clone.remove();
+            resolve();
+          }, 400);
+        });
+      });
+    } else {
+      callback();
+      this.render();
+    }
   }
 }
 
