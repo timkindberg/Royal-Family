@@ -6,8 +6,6 @@ class GameUI {
     this.ai = null;
     this.vsAI = false;
     this.aiTurnInProgress = false;
-    this.lastPhase = null; // Track phase changes
-    this.animationQueue = []; // Queue for sequential animations
     this.bindElements();
     this.bindEvents();
     this.showScreen('title-screen');
@@ -94,7 +92,6 @@ class GameUI {
     this.game.reset();
     this.vsAI = vsAI;
     this.aiTurnInProgress = false;
-    this.lastPhase = null; // Reset phase tracking
 
     if (vsAI) {
       // AI controls player 2 (The Scarlett - Red)
@@ -196,12 +193,6 @@ class GameUI {
 
   // Main render function
   render() {
-    // Detect phase changes and show banners
-    if (this.lastPhase !== this.game.phase) {
-      this.handlePhaseChange(this.lastPhase, this.game.phase);
-      this.lastPhase = this.game.phase;
-    }
-
     this.renderField();
     this.renderPlayers();
     this.renderGameInfo();
@@ -217,32 +208,6 @@ class GameUI {
 
     // Check if AI should take a turn
     this.checkAITurn();
-  }
-
-  // Handle phase transitions with banners
-  handlePhaseChange(oldPhase, newPhase) {
-    // Don't show banner on initial setup
-    if (!oldPhase) return;
-
-    switch (newPhase) {
-      case 'draw':
-        this.showPhaseBanner('DRAW PHASE', 'Choose a card from deck or field', '🎴');
-        break;
-      case 'action':
-        this.showPhaseBanner('ACTION PHASE', 'Execute your strategy', '⚔️');
-        break;
-      case 'flop':
-        if (this.game.roundNumber > 1) {
-          this.showPhaseBanner(`ROUND ${this.game.roundNumber}`, 'A new round begins', '🎯');
-        }
-        break;
-      case 'raid-choice':
-        this.showPhaseBanner('RAID SUCCESSFUL!', 'Choose your follow-up action', '💥');
-        break;
-      case 'assassin-surprise':
-        this.showPhaseBanner('ASSASSIN ATTACK!', 'Sacrifice a royal or lose the card', '🗡️');
-        break;
-    }
   }
 
   // Check if it's the AI's turn and trigger it
@@ -926,26 +891,6 @@ class GameUI {
         resolve();
       }, duration);
     });
-  }
-
-  // Show phase transition banner
-  showPhaseBanner(title, subtitle, icon = '') {
-    // Remove any existing banner
-    const existing = document.querySelector('.phase-banner');
-    if (existing) existing.remove();
-
-    const banner = document.createElement('div');
-    banner.className = 'phase-banner';
-    banner.innerHTML = `
-      ${icon ? `<span class="phase-icon">${icon}</span>` : ''}
-      <div class="phase-banner-title">${title}</div>
-      <div class="phase-banner-subtitle">${subtitle}</div>
-    `;
-
-    document.body.appendChild(banner);
-
-    // Auto-remove after animation
-    setTimeout(() => banner.remove(), 1200);
   }
 
   // Animate card draw from deck
