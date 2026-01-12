@@ -1786,3 +1786,32 @@ body::before {
 .alliance-activating {
   animation: allianceActivate 1s ease;
 }
+
+/* ========== VIEW TRANSITIONS ========== */
+
+/* Configure view transition for card movements */
+::view-transition-old(card-moving),
+::view-transition-new(card-moving) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(card-moving) {
+  animation-name: fade-out-scale;
+}
+
+::view-transition-new(card-moving) {
+  animation-name: fade-in-scale;
+}
+
+@keyframes fade-out-scale {
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0.5;
+  }
+}
